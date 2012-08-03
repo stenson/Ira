@@ -1,0 +1,299 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		02C2D87F15A4A92000C46968 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C2D87E15A4A92000C46968 /* UIKit.framework */; };
+		02C2D88115A4A92000C46968 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C2D88015A4A92000C46968 /* Foundation.framework */; };
+		02C2D88315A4A92000C46968 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C2D88215A4A92000C46968 /* CoreGraphics.framework */; };
+		02C2D88915A4A92000C46968 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 02C2D88715A4A92000C46968 /* InfoPlist.strings */; };
+		02C2D88B15A4A92000C46968 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C2D88A15A4A92000C46968 /* main.m */; };
+		02C2D88F15A4A92000C46968 /* VLFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C2D88E15A4A92000C46968 /* VLFAppDelegate.m */; };
+		02C2D89215A4A92000C46968 /* VLFViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C2D89115A4A92000C46968 /* VLFViewController.m */; };
+		02C2D89515A4A92000C46968 /* VLFViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 02C2D89315A4A92000C46968 /* VLFViewController.xib */; };
+		02C2D8A115A4B31900C46968 /* VLFAudioGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C2D8A015A4B31900C46968 /* VLFAudioGraph.m */; };
+		02C2D8A315A4B46E00C46968 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C2D8A215A4B46E00C46968 /* AudioToolbox.framework */; };
+		02C2D8A515A5001500C46968 /* ira.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2D8A415A5001500C46968 /* ira.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		02C2D87A15A4A92000C46968 /* Ira.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ira.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		02C2D87E15A4A92000C46968 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		02C2D88015A4A92000C46968 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		02C2D88215A4A92000C46968 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		02C2D88615A4A92000C46968 /* Ira-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Ira-Info.plist"; sourceTree = "<group>"; };
+		02C2D88815A4A92000C46968 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		02C2D88A15A4A92000C46968 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		02C2D88C15A4A92000C46968 /* Ira-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Ira-Prefix.pch"; sourceTree = "<group>"; };
+		02C2D88D15A4A92000C46968 /* VLFAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFAppDelegate.h; sourceTree = "<group>"; };
+		02C2D88E15A4A92000C46968 /* VLFAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLFAppDelegate.m; sourceTree = "<group>"; };
+		02C2D89015A4A92000C46968 /* VLFViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFViewController.h; sourceTree = "<group>"; };
+		02C2D89115A4A92000C46968 /* VLFViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLFViewController.m; sourceTree = "<group>"; };
+		02C2D89415A4A92000C46968 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/VLFViewController.xib; sourceTree = "<group>"; };
+		02C2D89F15A4B31900C46968 /* VLFAudioGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFAudioGraph.h; sourceTree = "<group>"; };
+		02C2D8A015A4B31900C46968 /* VLFAudioGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFAudioGraph.m; sourceTree = "<group>"; };
+		02C2D8A215A4B46E00C46968 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		02C2D8A415A5001500C46968 /* ira.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ira.png; path = ../../ira.png; sourceTree = "<group>"; };
+		9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFAudioUtilities.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		02C2D87715A4A92000C46968 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02C2D8A315A4B46E00C46968 /* AudioToolbox.framework in Frameworks */,
+				02C2D87F15A4A92000C46968 /* UIKit.framework in Frameworks */,
+				02C2D88115A4A92000C46968 /* Foundation.framework in Frameworks */,
+				02C2D88315A4A92000C46968 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		02C2D86F15A4A92000C46968 = {
+			isa = PBXGroup;
+			children = (
+				02C2D8A215A4B46E00C46968 /* AudioToolbox.framework */,
+				02C2D88415A4A92000C46968 /* Ira */,
+				02C2D87D15A4A92000C46968 /* Frameworks */,
+				02C2D87B15A4A92000C46968 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		02C2D87B15A4A92000C46968 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				02C2D87A15A4A92000C46968 /* Ira.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		02C2D87D15A4A92000C46968 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				02C2D87E15A4A92000C46968 /* UIKit.framework */,
+				02C2D88015A4A92000C46968 /* Foundation.framework */,
+				02C2D88215A4A92000C46968 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		02C2D88415A4A92000C46968 /* Ira */ = {
+			isa = PBXGroup;
+			children = (
+				02C2D88D15A4A92000C46968 /* VLFAppDelegate.h */,
+				02C2D88E15A4A92000C46968 /* VLFAppDelegate.m */,
+				02C2D89015A4A92000C46968 /* VLFViewController.h */,
+				02C2D89115A4A92000C46968 /* VLFViewController.m */,
+				02C2D89315A4A92000C46968 /* VLFViewController.xib */,
+				02C2D88515A4A92000C46968 /* Supporting Files */,
+				02C2D89F15A4B31900C46968 /* VLFAudioGraph.h */,
+				02C2D8A015A4B31900C46968 /* VLFAudioGraph.m */,
+				9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */,
+			);
+			path = Ira;
+			sourceTree = "<group>";
+		};
+		02C2D88515A4A92000C46968 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				02C2D8A415A5001500C46968 /* ira.png */,
+				02C2D88615A4A92000C46968 /* Ira-Info.plist */,
+				02C2D88715A4A92000C46968 /* InfoPlist.strings */,
+				02C2D88A15A4A92000C46968 /* main.m */,
+				02C2D88C15A4A92000C46968 /* Ira-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		02C2D87915A4A92000C46968 /* Ira */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 02C2D89815A4A92000C46968 /* Build configuration list for PBXNativeTarget "Ira" */;
+			buildPhases = (
+				02C2D87615A4A92000C46968 /* Sources */,
+				02C2D87715A4A92000C46968 /* Frameworks */,
+				02C2D87815A4A92000C46968 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Ira;
+			productName = Ira;
+			productReference = 02C2D87A15A4A92000C46968 /* Ira.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		02C2D87115A4A92000C46968 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = VLF;
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 02C2D87415A4A92000C46968 /* Build configuration list for PBXProject "Ira" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 02C2D86F15A4A92000C46968;
+			productRefGroup = 02C2D87B15A4A92000C46968 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				02C2D87915A4A92000C46968 /* Ira */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		02C2D87815A4A92000C46968 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02C2D88915A4A92000C46968 /* InfoPlist.strings in Resources */,
+				02C2D89515A4A92000C46968 /* VLFViewController.xib in Resources */,
+				02C2D8A515A5001500C46968 /* ira.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		02C2D87615A4A92000C46968 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02C2D88B15A4A92000C46968 /* main.m in Sources */,
+				02C2D88F15A4A92000C46968 /* VLFAppDelegate.m in Sources */,
+				02C2D89215A4A92000C46968 /* VLFViewController.m in Sources */,
+				02C2D8A115A4B31900C46968 /* VLFAudioGraph.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		02C2D88715A4A92000C46968 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				02C2D88815A4A92000C46968 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		02C2D89315A4A92000C46968 /* VLFViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				02C2D89415A4A92000C46968 /* en */,
+			);
+			name = VLFViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		02C2D89615A4A92000C46968 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		02C2D89715A4A92000C46968 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		02C2D89915A4A92000C46968 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Ira/Ira-Prefix.pch";
+				INFOPLIST_FILE = "Ira/Ira-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		02C2D89A15A4A92000C46968 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Ira/Ira-Prefix.pch";
+				INFOPLIST_FILE = "Ira/Ira-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		02C2D87415A4A92000C46968 /* Build configuration list for PBXProject "Ira" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				02C2D89615A4A92000C46968 /* Debug */,
+				02C2D89715A4A92000C46968 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		02C2D89815A4A92000C46968 /* Build configuration list for PBXNativeTarget "Ira" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				02C2D89915A4A92000C46968 /* Debug */,
+				02C2D89A15A4A92000C46968 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 02C2D87115A4A92000C46968 /* Project object */;
+}
