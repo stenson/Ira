@@ -18,6 +18,7 @@
 		02C2D8A115A4B31900C46968 /* VLFAudioGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C2D8A015A4B31900C46968 /* VLFAudioGraph.m */; };
 		02C2D8A315A4B46E00C46968 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C2D8A215A4B46E00C46968 /* AudioToolbox.framework */; };
 		02C2D8A515A5001500C46968 /* ira.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2D8A415A5001500C46968 /* ira.png */; };
+		98A3CBD115CB86C000C13711 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98A3CBD015CB86C000C13711 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		02C2D8A215A4B46E00C46968 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		02C2D8A415A5001500C46968 /* ira.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ira.png; path = ../../ira.png; sourceTree = "<group>"; };
 		9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFAudioUtilities.h; sourceTree = "<group>"; };
+		98A3CBD015CB86C000C13711 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98A3CBD115CB86C000C13711 /* AVFoundation.framework in Frameworks */,
 				02C2D8A315A4B46E00C46968 /* AudioToolbox.framework in Frameworks */,
 				02C2D87F15A4A92000C46968 /* UIKit.framework in Frameworks */,
 				02C2D88115A4A92000C46968 /* Foundation.framework in Frameworks */,
@@ -59,6 +62,7 @@
 		02C2D86F15A4A92000C46968 = {
 			isa = PBXGroup;
 			children = (
+				98A3CBD015CB86C000C13711 /* AVFoundation.framework */,
 				02C2D8A215A4B46E00C46968 /* AudioToolbox.framework */,
 				02C2D88415A4A92000C46968 /* Ira */,
 				02C2D87D15A4A92000C46968 /* Frameworks */,

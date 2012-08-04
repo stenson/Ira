@@ -8,9 +8,13 @@
 
 #import "VLFAudioGraph.h"
 
+static NSString * const kRecordedFileName = @"%@/recorded-output.m4a";
+
 @interface VLFAudioGraph () {
     AUGraph graph;
     AudioUnit eqUnit;
+    AudioUnit filePlayerUnit;
+    CFURLRef destinationURL;
     ExtAudioFileRef outputFile;
     AudioStreamBasicDescription outputASBD;
     BOOL recording;
@@ -137,6 +141,9 @@ static OSStatus RecordingCallback (void *inRefCon,
     AUNode lowpass = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_LowPassFilter];
     AUNode dp = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_DynamicsProcessor];
     
+    AUNode filePlayer = [self addNodeWithType:kAudioUnitType_Generator AndSubtype:kAudioUnitSubType_AudioFilePlayer];
+    AUNode finalMix = [self addNodeWithType:kAudioUnitType_Mixer AndSubtype:kAudioUnitSubType_MultiChannelMixer];
+    
     CheckError(AUGraphOpen(graph), "open graph");
     
     AudioUnit rioUnit;
@@ -144,24 +151,25 @@ static OSStatus RecordingCallback (void *inRefCon,
     AudioUnit lowpassUnit;
     AudioUnit dpUnit;
     
+    CheckError(AUGraphNodeInfo(graph, dp, NULL, &dpUnit), "dpUnit");
     CheckError(AUGraphNodeInfo(graph, rio, NULL, &rioUnit), "rioUnit");
     CheckError(AUGraphNodeInfo(graph, mixer, NULL, &mixerUnit), "mixerUnit");
     CheckError(AUGraphNodeInfo(graph, lowpass, NULL, &lowpassUnit), "lowpassUnit");
-    CheckError(AUGraphNodeInfo(graph, dp, NULL, &dpUnit), "dpUnit");
+    CheckError(AUGraphNodeInfo(graph, filePlayer, NULL, &filePlayerUnit), "filePlayerUnit");
     
     eqUnit = [self configureEQNode:eq  WithHz:209  Db:-6.0  AndQ:0.30];
     [self configureEQNode:eq2 WithHz:541  Db:-12.0 AndQ:0.30];
     [self configureEQNode:eq3 WithHz:1495 Db:-12.0 AndQ:0.30];
     [self configureEQNode:eq4 WithHz:3256 Db:-6.0  AndQ:0.30];
     
-    [self configureDynamicsUnit:dpUnit
-                  WithThreshold:-100
-                       headroom:30
-                 expansionRatio:50.0
-             expansionThreshold:-100
-                     attackTime:0.03
-                    releaseTime:0.0
-                        andGain:30];
+    [self configureDynamicsUnit: dpUnit
+                  WithThreshold: -100
+                       headroom: 30
+                 expansionRatio: 50.0
+             expansionThreshold: -100
+                     attackTime: 0.03
+                    releaseTime: 0.0
+                        andGain: 30];
     
     CheckError(AudioUnitSetParameter(lowpassUnit, kLowPassParam_CutoffFrequency, kAudioUnitScope_Global, 0, 20000.0, 0), "cut freq");
 
@@ -171,31 +179,19 @@ static OSStatus RecordingCallback (void *inRefCon,
 			   "Couldn't enable RIO output");
 	
 	AudioUnitElement bus1 = 1;
-	CheckError(AudioUnitSetProperty(rioUnit,
-									kAudioOutputUnitProperty_EnableIO,
-									kAudioUnitScope_Input,
-									bus1,
-									&oneFlag,
-									sizeof(oneFlag)),
+	CheckError(AudioUnitSetProperty(rioUnit, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, bus1, &oneFlag, sizeof(oneFlag)),
 			   "Couldn't enable RIO input");
     
     AudioStreamBasicDescription effectASBD;
     UInt32 asbdSize = sizeof(effectASBD);
     memset(&effectASBD, 0, asbdSize);
     
-    CheckError(AudioUnitGetProperty(eqUnit,
-                                    kAudioUnitProperty_StreamFormat,
-                                    kAudioUnitScope_Input,
-                                    0,
-                                    &effectASBD,
-                                    &asbdSize),
+    CheckError(AudioUnitGetProperty(eqUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &effectASBD, &asbdSize),
                "get the effect asbd");
     
     Float64 hardwareSampleRate;
 	UInt32 propSize = sizeof (hardwareSampleRate);
-	CheckError(AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareSampleRate,
-									   &propSize,
-									   &hardwareSampleRate),
+	CheckError(AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareSampleRate, &propSize, &hardwareSampleRate),
 			   "Couldn't get hardwareSampleRate");
     
     NSLog(@"hardware sample rate %f", hardwareSampleRate);
@@ -205,18 +201,14 @@ static OSStatus RecordingCallback (void *inRefCon,
     
     // set kAudioUnitProperty_StreamFormat on input & output of eqUnit with updated sample rate (is it always 44100?)
 
-    CheckError(AudioUnitSetProperty(mixerUnit,
-                                    kAudioUnitProperty_StreamFormat,
-                                    kAudioUnitScope_Output,
-                                    0,
-                                    &effectASBD,
-                                    asbdSize),
+    CheckError(AudioUnitSetProperty(mixerUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize),
                "set asbd on mixer output");
 
     self->outputASBD = effectASBD;
     
     AudioUnitAddRenderNotify(dpUnit, &RecordingCallback, (__bridge void*)self);
     
+    // microphone chain
     CheckError(AUGraphConnectNodeInput(graph, rio, 1,       mixer, 0),      "plug");
     CheckError(AUGraphConnectNodeInput(graph, mixer, 0,     eq, 0),         "plug");
     CheckError(AUGraphConnectNodeInput(graph, eq, 0,        eq2, 0),        "plug");
@@ -224,9 +216,49 @@ static OSStatus RecordingCallback (void *inRefCon,
     CheckError(AUGraphConnectNodeInput(graph, eq3, 0,       eq4, 0),        "plug");
     CheckError(AUGraphConnectNodeInput(graph, eq4, 0,       lowpass, 0),    "plug");
     CheckError(AUGraphConnectNodeInput(graph, lowpass, 0,   dp, 0),         "plug");
-    CheckError(AUGraphConnectNodeInput(graph, dp, 0,        rio, 0),        "plug");
+    
+    // to final mixer
+    CheckError(AUGraphConnectNodeInput(graph, dp, 0,            finalMix, 0),   "plug");
+    CheckError(AUGraphConnectNodeInput(graph, filePlayer, 0,    finalMix, 1),   "plug");
+    
+    // to headphones
+    CheckError(AUGraphConnectNodeInput(graph, finalMix, 0,      rio, 0),        "plug");
     
     [self enableGraph];
+}
+
+- (void)playbackRecording
+{
+    AudioFileID recordedFile;
+    CheckError(AudioFileOpenURL(destinationURL, kAudioFileReadPermission, 0, &recordedFile), "read");
+    
+    CheckError(AudioUnitSetProperty(filePlayerUnit, kAudioUnitProperty_ScheduledFileIDs,
+                                    kAudioUnitScope_Global, 0, &recordedFile, sizeof(recordedFile)), "file to unit");
+    
+    
+    UInt64 numPackets;
+    UInt32 propSize = sizeof(numPackets);
+    CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyAudioDataPacketCount, &propSize, &numPackets), "packets");
+    
+    ScheduledAudioFileRegion rgn;
+    memset(&rgn.mTimeStamp, 0, sizeof(rgn.mTimeStamp));
+    rgn.mTimeStamp.mFlags = kAudioTimeStampSampleTimeValid;
+    rgn.mTimeStamp.mSampleTime = 0;
+    rgn.mCompletionProc = NULL;
+    rgn.mCompletionProcUserData = NULL;
+    rgn.mAudioFile = recordedFile;
+    rgn.mLoopCount = 2;
+    rgn.mStartFrame = 0;
+    rgn.mFramesToPlay = 1000000;
+    
+    CheckError(AudioUnitSetProperty(filePlayerUnit, kAudioUnitProperty_ScheduledFileRegion, kAudioUnitScope_Global, 0, &rgn, sizeof(rgn)), "region");
+    
+    AudioTimeStamp startTime;
+    memset(&startTime, 0, sizeof(startTime));
+    startTime.mFlags = kAudioTimeStampSampleTimeValid;
+    startTime.mSampleTime = -1;
+    
+    CheckError(AudioUnitSetProperty(filePlayerUnit, kAudioUnitProperty_ScheduleStartTimeStamp, kAudioUnitScope_Global, 0, &startTime, sizeof(startTime)), "start time");
 }
 
 - (void)toggleRecording
@@ -242,6 +274,8 @@ static OSStatus RecordingCallback (void *inRefCon,
 {
     self->recording = NO;
     CheckError(ExtAudioFileDispose(outputFile), "dispose");
+    
+    [self playbackRecording];
 }
 
 - (void)startRecording
@@ -249,11 +283,8 @@ static OSStatus RecordingCallback (void *inRefCon,
     NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     
-    NSString *destinationFilePath = [[NSString alloc] initWithFormat: @"%@/voice.m4a", documentsDirectory];
-    CFURLRef destinationURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-                                                            (__bridge CFStringRef)destinationFilePath, 
-                                                            kCFURLPOSIXPathStyle,
-                                                            false);
+    NSString *destinationFilePath = [[NSString alloc] initWithFormat: kRecordedFileName, documentsDirectory];
+    destinationURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)destinationFilePath, kCFURLPOSIXPathStyle, false);
     AudioStreamBasicDescription asbd;
     memset(&asbd, 0, sizeof(asbd));
     UInt32 asbdSize = sizeof(asbd);
@@ -265,18 +296,10 @@ static OSStatus RecordingCallback (void *inRefCon,
     CheckError(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &asbdSize, &asbd),
                "complete asbd for aac");
     
-    CheckError(ExtAudioFileCreateWithURL(destinationURL,
-                                         kAudioFileM4AType,
-                                         &asbd,
-                                         NULL,
-                                         kAudioFileFlags_EraseFile,
-                                         &outputFile),
+    CheckError(ExtAudioFileCreateWithURL(destinationURL, kAudioFileM4AType, &asbd, NULL, kAudioFileFlags_EraseFile, &outputFile),
                "create ext audio output file");
     
-    CheckError(ExtAudioFileSetProperty(outputFile,
-                                       kExtAudioFileProperty_ClientDataFormat,
-                                       asbdSize,
-                                       &self->outputASBD),
+    CheckError(ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ClientDataFormat, asbdSize, &self->outputASBD),
                "create file for format");
     
     UInt32 codec = kAppleHardwareAudioCodecManufacturer;
