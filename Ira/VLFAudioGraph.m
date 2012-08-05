@@ -17,7 +17,9 @@ static NSString * const kRecordedFileName = @"%@/recorded-output.m4a";
     CFURLRef destinationURL;
     ExtAudioFileRef outputFile;
     AudioStreamBasicDescription outputASBD;
+    AudioStreamBasicDescription aacASBD;
     BOOL recording;
+    BOOL graphEnabled;
 }
 @end
 
@@ -224,6 +226,8 @@ static OSStatus RecordingCallback (void *inRefCon,
     // to headphones
     CheckError(AUGraphConnectNodeInput(graph, finalMix, 0,      rio, 0),        "plug");
     
+    aacASBD = [self getAACFormat];
+    
     [self enableGraph];
 }
 
@@ -259,6 +263,8 @@ static OSStatus RecordingCallback (void *inRefCon,
     startTime.mSampleTime = -1;
     
     CheckError(AudioUnitSetProperty(filePlayerUnit, kAudioUnitProperty_ScheduleStartTimeStamp, kAudioUnitScope_Global, 0, &startTime, sizeof(startTime)), "start time");
+    
+    
 }
 
 - (void)toggleRecording
@@ -285,21 +291,11 @@ static OSStatus RecordingCallback (void *inRefCon,
     
     NSString *destinationFilePath = [[NSString alloc] initWithFormat: kRecordedFileName, documentsDirectory];
     destinationURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)destinationFilePath, kCFURLPOSIXPathStyle, false);
-    AudioStreamBasicDescription asbd;
-    memset(&asbd, 0, sizeof(asbd));
-    UInt32 asbdSize = sizeof(asbd);
     
-    asbd.mChannelsPerFrame = 2;
-    asbd.mFormatID = kAudioFormatMPEG4AAC_LD;
-    //asbd.mFormatFlags = kMPEG4Object_HVXC;
-    
-    CheckError(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &asbdSize, &asbd),
-               "complete asbd for aac");
-    
-    CheckError(ExtAudioFileCreateWithURL(destinationURL, kAudioFileM4AType, &asbd, NULL, kAudioFileFlags_EraseFile, &outputFile),
+    CheckError(ExtAudioFileCreateWithURL(destinationURL, kAudioFileM4AType, &aacASBD, NULL, kAudioFileFlags_EraseFile, &outputFile),
                "create ext audio output file");
     
-    CheckError(ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ClientDataFormat, asbdSize, &self->outputASBD),
+    CheckError(ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ClientDataFormat, sizeof(aacASBD), &self->outputASBD),
                "create file for format");
     
     UInt32 codec = kAppleHardwareAudioCodecManufacturer;
@@ -311,6 +307,22 @@ static OSStatus RecordingCallback (void *inRefCon,
     ExtAudioFileSeek(outputFile, 0);
     
     self->recording = YES;
+}
+
+- (AudioStreamBasicDescription)getAACFormat
+{
+    AudioStreamBasicDescription asbd;
+    memset(&asbd, 0, sizeof(asbd));
+    UInt32 asbdSize = sizeof(asbd);
+    
+    asbd.mChannelsPerFrame = 2;
+    asbd.mFormatID = kAudioFormatMPEG4AAC_LD;
+    //asbd.mFormatFlags = kMPEG4Object_HVXC;
+    
+    CheckError(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &asbdSize, &asbd),
+               "complete asbd for aac");
+    
+    return asbd;
 }
 
 - (void)printASBD: (AudioStreamBasicDescription) asbd
@@ -332,14 +344,21 @@ static OSStatus RecordingCallback (void *inRefCon,
 
 - (BOOL)enableGraph
 {
-    CheckError(AUGraphInitialize(graph), "initialize graph");
-    CheckError(AudioSessionSetActive(true), "active");
-    CheckError(AUGraphStart(graph), "start");
-    return YES;
+    if (self->graphEnabled == YES) {
+        return YES;
+    } else {
+        self->graphEnabled = YES;
+        NSLog(@"ENABLING GRAPH");
+        CheckError(AUGraphInitialize(graph), "initialize graph");
+        CheckError(AudioSessionSetActive(true), "active");
+        CheckError(AUGraphStart(graph), "start");
+        return YES;
+    }
 }
 
 - (BOOL)disableGraph
 {
+    self->graphEnabled = NO;
     NSLog(@"stopping");
 
     CheckError(AUGraphStop(graph), "stop");

@@ -12,48 +12,31 @@
 @interface VLFViewController () {
     VLFAudioGraph *audioGraph;
     UIButton *standby;
+    UIButton *record;
 }
-@property (weak, nonatomic) IBOutlet UIButton *recordButton;
 @end
 
 @implementation VLFViewController
-@synthesize recordButton;
 
-- (IBAction)recordButtonPressed:(id)sender
+- (void)restartAudioGraph
 {
-    NSLog(@"toggle");
-    [audioGraph toggleRecording];
-}
-
-- (void)resetAudioGraph
-{
-    //if ([masterSwitch isOn]) {
     [audioGraph enableGraph];
-    //} else {
-    //[audioGraph disableGraph];
-    //}
 }
 
 - (void)turnOffAudioGraph
 {
-    //if ([masterSwitch isOn]) {
     [audioGraph disableGraph];
-    //}
 }
 
 - (void)addStandbyButton
 {
-//    standby = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-//    [standby setTitle:@"S" forState:UIControlStateNormal];
-//    [standby setFrame:CGRectMake(0, 0, 50, 50)];
-    
     standby = [UIButton buttonWithType:UIButtonTypeCustom];
     [standby setTitle:@"S" forState:UIControlStateNormal];
-    [standby setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    standby.backgroundColor = [UIColor greenColor];
+    [standby setTitleColor:[UIColor clearColor] forState:UIControlStateNormal];
+    standby.backgroundColor = [UIColor colorWithRed:0.24f green:0.70f blue:0.44f alpha:0.8f];
     standby.layer.cornerRadius = 25.0f;
     
-    standby.frame = CGRectMake(100, 200, 50, 50);
+    standby.frame = CGRectMake(15, 315, 50, 50);
     [[self view] addSubview:standby];
     [standby addTarget:self action:@selector(standbyPressed) forControlEvents:UIControlEventTouchUpInside];
 }
@@ -63,15 +46,30 @@
     NSLog(@"STANDBY STANDBY");
 }
 
-- (void)addAudioButton:(UIButton *)button withBackgroundColor:(UIColor *)color diameter:(float) andSelector:(SEL)s
+- (void)addRecordButton
 {
+    record = [UIButton buttonWithType:UIButtonTypeCustom];
+    [record setTitle:@"R" forState:UIControlStateNormal];
+    [record setTitle:@"W" forState:UIControlStateSelected];
+    [record setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+    record.backgroundColor = [UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.8f];
+    record.layer.cornerRadius = 75.0f;
     
+    record.frame = CGRectMake(40, 175, 150, 150);
+    [[self view] addSubview:record];
+    [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)recordPressed
+{
+    [audioGraph toggleRecording];
 }
 
 - (void)viewDidLoad
 {
     self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"ira"]];
     
+    [self addRecordButton];
     [self addStandbyButton];
     
     audioGraph = [[VLFAudioGraph alloc] init];
@@ -82,7 +80,6 @@
 
 - (void)viewDidUnload
 {
-    [self setRecordButton:nil];
     [super viewDidUnload];
 }
 

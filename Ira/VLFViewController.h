@@ -10,6 +10,6 @@
 #import "VLFAudioGraph.h"
 
 @interface VLFViewController : UIViewController
-- (void)resetAudioGraph;
+- (void)restartAudioGraph;
 - (void)turnOffAudioGraph;
 @end
