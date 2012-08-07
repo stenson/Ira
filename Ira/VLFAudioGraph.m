@@ -148,16 +148,18 @@ static OSStatus RecordingCallback (void *inRefCon,
     
     CheckError(AUGraphOpen(graph), "open graph");
     
+    AudioUnit dpUnit;
     AudioUnit rioUnit;
     AudioUnit mixerUnit;
     AudioUnit lowpassUnit;
-    AudioUnit dpUnit;
+    AudioUnit finalMixUnit;
     
     CheckError(AUGraphNodeInfo(graph, dp, NULL, &dpUnit), "dpUnit");
     CheckError(AUGraphNodeInfo(graph, rio, NULL, &rioUnit), "rioUnit");
     CheckError(AUGraphNodeInfo(graph, mixer, NULL, &mixerUnit), "mixerUnit");
     CheckError(AUGraphNodeInfo(graph, lowpass, NULL, &lowpassUnit), "lowpassUnit");
     CheckError(AUGraphNodeInfo(graph, filePlayer, NULL, &filePlayerUnit), "filePlayerUnit");
+    CheckError(AUGraphNodeInfo(graph, finalMix, NULL, &finalMixUnit), "finalMixUnit");
     
     eqUnit = [self configureEQNode:eq  WithHz:209  Db:-6.0  AndQ:0.30];
     [self configureEQNode:eq2 WithHz:541  Db:-12.0 AndQ:0.30];
@@ -171,7 +173,7 @@ static OSStatus RecordingCallback (void *inRefCon,
              expansionThreshold: -100
                      attackTime: 0.03
                     releaseTime: 0.0
-                        andGain: 30];
+                        andGain: 40];
     
     CheckError(AudioUnitSetParameter(lowpassUnit, kLowPassParam_CutoffFrequency, kAudioUnitScope_Global, 0, 20000.0, 0), "cut freq");
 
@@ -231,10 +233,10 @@ static OSStatus RecordingCallback (void *inRefCon,
     [self enableGraph];
 }
 
-- (void)playbackRecording
+- (void)playbackURL:(CFURLRef)url
 {
     AudioFileID recordedFile;
-    CheckError(AudioFileOpenURL(destinationURL, kAudioFileReadPermission, 0, &recordedFile), "read");
+    CheckError(AudioFileOpenURL(url, kAudioFileReadPermission, 0, &recordedFile), "read");
     
     CheckError(AudioUnitSetProperty(filePlayerUnit, kAudioUnitProperty_ScheduledFileIDs,
                                     kAudioUnitScope_Global, 0, &recordedFile, sizeof(recordedFile)), "file to unit");
@@ -251,7 +253,7 @@ static OSStatus RecordingCallback (void *inRefCon,
     rgn.mCompletionProc = NULL;
     rgn.mCompletionProcUserData = NULL;
     rgn.mAudioFile = recordedFile;
-    rgn.mLoopCount = 2;
+    rgn.mLoopCount = 0;
     rgn.mStartFrame = 0;
     rgn.mFramesToPlay = 1000000;
     
@@ -263,16 +265,29 @@ static OSStatus RecordingCallback (void *inRefCon,
     startTime.mSampleTime = -1;
     
     CheckError(AudioUnitSetProperty(filePlayerUnit, kAudioUnitProperty_ScheduleStartTimeStamp, kAudioUnitScope_Global, 0, &startTime, sizeof(startTime)), "start time");
-    
-    
 }
 
-- (void)toggleRecording
+- (void)playMusicLoop
+{
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"neworleans" ofType:@"m4a"];
+    NSLog(@"%@", filePath);
+    CFURLRef urlRef = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)filePath, kCFURLPOSIXPathStyle, false);
+    [self playbackURL:urlRef];
+}
+
+- (void)playbackRecording
+{
+    [self playbackURL:destinationURL];
+}
+
+- (BOOL)toggleRecording
 {
     if (self->recording) {
         [self stopRecording];
+        return NO;
     } else {
         [self startRecording];
+        return YES;
     }
 }
 
@@ -371,28 +386,20 @@ static OSStatus RecordingCallback (void *inRefCon,
 {
     self->recording = NO;
     
-    CheckError(AudioSessionInitialize(NULL,
-                                      kCFRunLoopDefaultMode,
-                                      InterruptionListener,
-                                      (__bridge void *)self),
+    CheckError(AudioSessionInitialize(NULL, kCFRunLoopDefaultMode, InterruptionListener, (__bridge void *)self),
                "couldn't initialize audio session");
     
 	UInt32 category = kAudioSessionCategory_PlayAndRecord;
-    CheckError(AudioSessionSetProperty(kAudioSessionProperty_AudioCategory,
-                                       sizeof(category),
-                                       &category),
+    CheckError(AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(category), &category),
                "Couldn't set category on audio session");
     
 	UInt32 ui32PropertySize = sizeof (UInt32);
 	UInt32 inputAvailable;
-	CheckError(AudioSessionGetProperty(kAudioSessionProperty_AudioInputAvailable,
-                                       &ui32PropertySize,
-                                       &inputAvailable),
+	CheckError(AudioSessionGetProperty(kAudioSessionProperty_AudioInputAvailable, &ui32PropertySize, &inputAvailable),
 			   "Couldn't get current audio input available prop");
     
     float aBufferLength = 0.005; // In seconds
-    AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration, 
-                            sizeof(aBufferLength), &aBufferLength);
+    AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration,  sizeof(aBufferLength), &aBufferLength);
     
 	if (!inputAvailable) {
 		[self notifyNoInputAvailable];

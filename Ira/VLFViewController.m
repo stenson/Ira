@@ -13,6 +13,7 @@
     VLFAudioGraph *audioGraph;
     UIButton *standby;
     UIButton *record;
+    UIButton *loop;
 }
 @end
 
@@ -46,13 +47,32 @@
     NSLog(@"STANDBY STANDBY");
 }
 
+- (void)addLoopButton
+{
+    loop = [UIButton buttonWithType:UIButtonTypeCustom];
+    [loop setTitle:@"" forState:UIControlStateNormal];
+    [loop setTitle:@"" forState:UIControlStateSelected];
+    [loop setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+    loop.backgroundColor = [UIColor colorWithRed:0.16f green:0.08f blue:0.84f alpha:0.8f];
+    loop.layer.cornerRadius = 50.0f;
+    
+    loop.frame = CGRectMake(40, 15, 100, 100);
+    [[self view] addSubview:loop];
+    [loop addTarget:self action:@selector(loopButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)loopButtonPressed
+{
+    [audioGraph playMusicLoop];
+}
+
 - (void)addRecordButton
 {
     record = [UIButton buttonWithType:UIButtonTypeCustom];
-    [record setTitle:@"R" forState:UIControlStateNormal];
-    [record setTitle:@"W" forState:UIControlStateSelected];
+    [record setTitle:@"" forState:UIControlStateNormal];
+    [record setTitle:@"" forState:UIControlStateSelected];
     [record setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
-    record.backgroundColor = [UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.8f];
+    record.backgroundColor = [UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.5f];
     record.layer.cornerRadius = 75.0f;
     
     record.frame = CGRectMake(40, 175, 150, 150);
@@ -60,9 +80,24 @@
     [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
 }
 
+- (void)animateButton:(UIButton *)button toColor:(UIColor *)color
+{
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.5];
+    button.backgroundColor = color;
+    [UIView commitAnimations];
+}
+
 - (void)recordPressed
 {
-    [audioGraph toggleRecording];
+    BOOL state = [audioGraph toggleRecording];
+    NSLog(@"state %d", state);
+    
+    if (state) {
+        [self animateButton:record toColor:[UIColor colorWithRed:0.96f green:0.18f blue:0.34f alpha:1.0f]];
+    } else {
+        [self animateButton:record toColor:[UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.5f]];
+    }
 }
 
 - (void)viewDidLoad
@@ -71,6 +106,7 @@
     
     [self addRecordButton];
     [self addStandbyButton];
+    [self addLoopButton];
     
     audioGraph = [[VLFAudioGraph alloc] init];
     [audioGraph setupAudioSession];

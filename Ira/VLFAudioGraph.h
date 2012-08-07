@@ -15,6 +15,7 @@
 - (BOOL)setupAudioSession;
 - (BOOL)enableGraph;
 - (BOOL)disableGraph;
-- (void)toggleRecording;
+- (BOOL)toggleRecording;
+- (void)playMusicLoop;
 
 @end
