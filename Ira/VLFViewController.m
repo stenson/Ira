@@ -56,7 +56,7 @@
     loop.backgroundColor = [UIColor colorWithRed:0.16f green:0.08f blue:0.84f alpha:0.8f];
     loop.layer.cornerRadius = 50.0f;
     
-    loop.frame = CGRectMake(40, 15, 100, 100);
+    loop.frame = CGRectMake(5, 15, 100, 100);
     [[self view] addSubview:loop];
     [loop addTarget:self action:@selector(loopButtonPressed) forControlEvents:UIControlEventTouchUpInside];
 }
@@ -75,7 +75,7 @@
     record.backgroundColor = [UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.5f];
     record.layer.cornerRadius = 75.0f;
     
-    record.frame = CGRectMake(40, 175, 150, 150);
+    record.frame = CGRectMake(5, 175, 150, 150);
     [[self view] addSubview:record];
     [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
 }
@@ -83,7 +83,7 @@
 - (void)animateButton:(UIButton *)button toColor:(UIColor *)color
 {
     [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.15];
     button.backgroundColor = color;
     [UIView commitAnimations];
 }
