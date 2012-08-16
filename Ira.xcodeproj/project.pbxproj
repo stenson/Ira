@@ -20,7 +20,7 @@
 		02C2D8A515A5001500C46968 /* ira.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2D8A415A5001500C46968 /* ira.png */; };
 		9899994915D0E2AF001CEB68 /* neworleans.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9899994815D0D7AC001CEB68 /* neworleans.m4a */; };
 		989A492415DAF86B0093ECAC /* doowop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 989A492315DAF8600093ECAC /* doowop.m4a */; };
-		989A492B15DC2BBB0093ECAC /* VLFFadeableLoop.m in Sources */ = {isa = PBXBuildFile; fileRef = 989A492A15DC2BBB0093ECAC /* VLFFadeableLoop.m */; };
+		989A493615DD1F130093ECAC /* VLFLoopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 989A493515DD1F130093ECAC /* VLFLoopButton.m */; };
 		98A3CBD115CB86C000C13711 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98A3CBD015CB86C000C13711 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -45,8 +45,8 @@
 		9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFAudioUtilities.h; sourceTree = "<group>"; };
 		9899994815D0D7AC001CEB68 /* neworleans.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = neworleans.m4a; sourceTree = "<group>"; };
 		989A492315DAF8600093ECAC /* doowop.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = doowop.m4a; path = "../../../Library/Application Support/iPhone Simulator/5.1/Applications/078F6802-F339-429D-92C8-7DE4FB47B4C4/Documents/doowop.m4a"; sourceTree = "<group>"; };
-		989A492915DC2BBB0093ECAC /* VLFFadeableLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFFadeableLoop.h; sourceTree = "<group>"; };
-		989A492A15DC2BBB0093ECAC /* VLFFadeableLoop.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFFadeableLoop.m; sourceTree = "<group>"; };
+		989A493415DD1F130093ECAC /* VLFLoopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFLoopButton.h; sourceTree = "<group>"; };
+		989A493515DD1F130093ECAC /* VLFLoopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFLoopButton.m; sourceTree = "<group>"; };
 		98A3CBD015CB86C000C13711 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -107,8 +107,8 @@
 				02C2D89F15A4B31900C46968 /* VLFAudioGraph.h */,
 				02C2D8A015A4B31900C46968 /* VLFAudioGraph.m */,
 				9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */,
-				989A492915DC2BBB0093ECAC /* VLFFadeableLoop.h */,
-				989A492A15DC2BBB0093ECAC /* VLFFadeableLoop.m */,
+				989A493415DD1F130093ECAC /* VLFLoopButton.h */,
+				989A493515DD1F130093ECAC /* VLFLoopButton.m */,
 			);
 			path = Ira;
 			sourceTree = "<group>";
@@ -197,7 +197,7 @@
 				02C2D88F15A4A92000C46968 /* VLFAppDelegate.m in Sources */,
 				02C2D89215A4A92000C46968 /* VLFViewController.m in Sources */,
 				02C2D8A115A4B31900C46968 /* VLFAudioGraph.m in Sources */,
-				989A492B15DC2BBB0093ECAC /* VLFFadeableLoop.m in Sources */,
+				989A493615DD1F130093ECAC /* VLFLoopButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -12,10 +12,16 @@
 
 @interface VLFAudioGraph : NSObject
 
++ (BOOL)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnit:(AudioUnit)unit;
+
 - (BOOL)setupAudioSession;
 - (BOOL)enableGraph;
 - (BOOL)disableGraph;
 - (BOOL)toggleRecording;
-- (int)playMusicLoopWithTitle:(NSString *)title;
+
+- (AudioUnit)getFilePlayerForIndex:(int)index;
+- (void)setGain:(Float32)gain forMixerInput:(int)index;
+- (void)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnitIndex:(int)index;
+- (int)fetchFilePlayer;
 
 @end

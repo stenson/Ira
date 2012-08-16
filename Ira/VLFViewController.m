@@ -13,7 +13,6 @@
     VLFAudioGraph *audioGraph;
     UIButton *standby;
     UIButton *record;
-    UIButton *loop;
 }
 @end
 
@@ -49,21 +48,15 @@
 
 - (void)addLoopButton
 {
-    loop = [UIButton buttonWithType:UIButtonTypeCustom];
-    [loop setTitle:@"" forState:UIControlStateNormal];
-    [loop setTitle:@"" forState:UIControlStateSelected];
-    [loop setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
-    loop.backgroundColor = [UIColor colorWithRed:0.16f green:0.08f blue:0.84f alpha:0.8f];
-    loop.layer.cornerRadius = 50.0f;
-    
-    loop.frame = CGRectMake(5, 15, 100, 100);
-    [[self view] addSubview:loop];
-    [loop addTarget:self action:@selector(loopButtonPressed) forControlEvents:UIControlEventTouchUpInside];
-}
+    [self.view addSubview:[[VLFLoopButton alloc] initWithFrame:CGRectMake(5, 15, 50, 50)
+                                                audioUnitIndex:[audioGraph fetchFilePlayer]
+                                                    audioGraph:audioGraph
+                                                  andLoopTitle:@"doowop"]];
 
-- (void)loopButtonPressed
-{
-    [audioGraph playMusicLoopWithTitle:@"doowop"];
+    [self.view addSubview:[[VLFLoopButton alloc] initWithFrame:CGRectMake(105, 15, 50, 50)
+                                                audioUnitIndex:[audioGraph fetchFilePlayer]
+                                                    audioGraph:audioGraph
+                                                  andLoopTitle:@"neworleans"]];
 }
 
 - (void)addRecordButton
@@ -104,12 +97,12 @@
 {
     self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"ira"]];
     
+    audioGraph = [[VLFAudioGraph alloc] init];
+    [audioGraph setupAudioSession];
+    
     [self addRecordButton];
     [self addStandbyButton];
     [self addLoopButton];
-    
-    audioGraph = [[VLFAudioGraph alloc] init];
-    [audioGraph setupAudioSession];
     
     [super viewDidLoad];
 }

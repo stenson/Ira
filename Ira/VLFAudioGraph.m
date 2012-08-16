@@ -10,22 +10,19 @@
 
 static NSString * const kRecordedFileName = @"%@/recorded-program-output.m4a";
 
-#pragma mark looping states
-
-static int const kLoopingStateSilent  = 0;
-static int const kLoopingStatePlaying = 1;
-static int const kLoopingStateFading  = 2;
-
 @interface VLFAudioGraph () {
     AUGraph graph;
     AudioUnit eqUnit;
     AudioUnit filePlayerUnit;
     AudioUnit _finalMixUnit;
+    AUNode _finalMix;
     CFURLRef destinationURL;
     ExtAudioFileRef outputFile;
     AudioStreamBasicDescription aacASBD;
     AudioStreamBasicDescription _notifierASBD;
-    NSArray *_loops;
+    
+    AudioUnit _filePlayers[4];
+    int _filePlayerCount;
     
     int _loopingState;
     BOOL recording;
@@ -34,6 +31,43 @@ static int const kLoopingStateFading  = 2;
 @end
 
 @implementation VLFAudioGraph
+
++ (BOOL)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnit:(AudioUnit)unit
+{
+    AudioFileID recordedFile;
+    CheckError(AudioFileOpenURL(url, kAudioFileReadPermission, 0, &recordedFile), "read");
+    
+    CheckError(AudioUnitSetProperty(unit, kAudioUnitProperty_ScheduledFileIDs,
+                                    kAudioUnitScope_Global, 0, &recordedFile, sizeof(recordedFile)), "file to unit");
+    
+    
+    UInt64 numPackets;
+    UInt32 propSize = sizeof(numPackets);
+    CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyAudioDataPacketCount, &propSize, &numPackets), "packets");
+    
+    ScheduledAudioFileRegion rgn;
+    memset(&rgn.mTimeStamp, 0, sizeof(rgn.mTimeStamp));
+    rgn.mTimeStamp.mFlags = kAudioTimeStampSampleTimeValid;
+    rgn.mTimeStamp.mSampleTime = 0;
+    rgn.mCompletionProc = NULL; 
+    rgn.mCompletionProcUserData = NULL;
+    rgn.mAudioFile = recordedFile;
+    rgn.mLoopCount = loopCount;
+    rgn.mStartFrame = 0;
+    rgn.mFramesToPlay = 1000000;
+    
+    CheckError(AudioUnitSetProperty(unit, kAudioUnitProperty_ScheduledFileRegion, kAudioUnitScope_Global, 0, &rgn, sizeof(rgn)), "region");
+    
+    AudioTimeStamp startTime;
+    memset(&startTime, 0, sizeof(startTime));
+    startTime.mFlags = kAudioTimeStampSampleTimeValid;
+    startTime.mSampleTime = -1;
+    
+    CheckError(AudioUnitSetProperty(unit, kAudioUnitProperty_ScheduleStartTimeStamp, kAudioUnitScope_Global, 0, &startTime, sizeof(startTime)),
+               "start time");
+    
+    return YES;
+}
 
 static void InterruptionListener (void *inUserData, UInt32 inInterruptionState) {
 	NSLog(@"INTERRUPTION");
@@ -63,7 +97,11 @@ static OSStatus RecordingCallback (void *inRefCon,
 
 - (void)notifyNoInputAvailable
 {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"No audio input" message:@"No audio input" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"No audio input"
+                                                    message:@"No audio input"
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
     [alert show];
 }
 
@@ -155,7 +193,7 @@ static OSStatus RecordingCallback (void *inRefCon,
     AUNode dp = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_DynamicsProcessor];
     
     AUNode filePlayer = [self addNodeWithType:kAudioUnitType_Generator AndSubtype:kAudioUnitSubType_AudioFilePlayer];
-    AUNode finalMix = [self addNodeWithType:kAudioUnitType_Mixer AndSubtype:kAudioUnitSubType_MultiChannelMixer];
+    _finalMix = [self addNodeWithType:kAudioUnitType_Mixer AndSubtype:kAudioUnitSubType_MultiChannelMixer];
     
     AUNode converter = [self addNodeWithType:kAudioUnitType_FormatConverter AndSubtype:kAudioUnitSubType_AUConverter];
     
@@ -171,7 +209,7 @@ static OSStatus RecordingCallback (void *inRefCon,
     CheckError(AUGraphNodeInfo(graph, rio, NULL, &rioUnit), "rioUnit");
     CheckError(AUGraphNodeInfo(graph, mixer, NULL, &mixerUnit), "mixerUnit");
     CheckError(AUGraphNodeInfo(graph, lowpass, NULL, &lowpassUnit), "lowpassUnit");
-    CheckError(AUGraphNodeInfo(graph, finalMix, NULL, &_finalMixUnit), "finalMixUnit");
+    CheckError(AUGraphNodeInfo(graph, _finalMix, NULL, &_finalMixUnit), "finalMixUnit");
     CheckError(AUGraphNodeInfo(graph, converter, NULL, &converterUnit), "converterUnit");
     CheckError(AUGraphNodeInfo(graph, filePlayer, NULL, &filePlayerUnit), "filePlayerUnit");
     
@@ -187,7 +225,7 @@ static OSStatus RecordingCallback (void *inRefCon,
              expansionThreshold: -100
                      attackTime: 0.03
                     releaseTime: 0.0
-                        andGain: 0.10];
+                        andGain: 20];
     
     CheckError(AudioUnitSetParameter(lowpassUnit, kLowPassParam_CutoffFrequency, kAudioUnitScope_Global, 0, 20000.0, 0), "cut freq");
 
@@ -230,8 +268,6 @@ static OSStatus RecordingCallback (void *inRefCon,
     CheckError(AudioUnitGetProperty(notifierUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &_notifierASBD, &asbdSize),
                "notifier ABSD");
     
-    [self printASBD:_notifierASBD];
-    
     // microphone chain
     CheckError(AUGraphConnectNodeInput(graph, rio, 1,       mixer, 0),      "plug");
     CheckError(AUGraphConnectNodeInput(graph, mixer, 0,     eq, 0),         "plug");
@@ -242,82 +278,52 @@ static OSStatus RecordingCallback (void *inRefCon,
     CheckError(AUGraphConnectNodeInput(graph, lowpass, 0,   dp, 0),         "plug");
     
     // to final mixer
-    CheckError(AUGraphConnectNodeInput(graph, dp, 0, finalMix, 0), "plug");
+    CheckError(AUGraphConnectNodeInput(graph, dp, 0, _finalMix, 0), "plug");
     CheckError(AUGraphConnectNodeInput(graph, filePlayer, 0, converter, 0), "plug");
-    CheckError(AUGraphConnectNodeInput(graph, converter, 0, finalMix, 1), "plug");
+    CheckError(AUGraphConnectNodeInput(graph, converter, 0, _finalMix, 1), "plug");
     
     // to headphones
-    CheckError(AUGraphConnectNodeInput(graph, finalMix, 0, rio, 0), "plug");
+    CheckError(AUGraphConnectNodeInput(graph, _finalMix, 0, rio, 0), "plug");
     
     aacASBD = [self getAACFormat];
     
     [self enableGraph];
 }
 
-- (void)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount
+- (int)fetchFilePlayer
 {
-    AudioFileID recordedFile;
-    CheckError(AudioFileOpenURL(url, kAudioFileReadPermission, 0, &recordedFile), "read");
+    AudioUnit unit;
+    AUNode player = [self addNodeWithType:kAudioUnitType_Generator AndSubtype:kAudioUnitSubType_AudioFilePlayer];
     
-    CheckError(AudioUnitSetProperty(filePlayerUnit, kAudioUnitProperty_ScheduledFileIDs,
-                                    kAudioUnitScope_Global, 0, &recordedFile, sizeof(recordedFile)), "file to unit");
+    CheckError(AUGraphNodeInfo(graph, player, NULL, &unit), "new file player unit");
+    CheckError(AUGraphConnectNodeInput(graph, player, 0, _finalMix, _filePlayerCount + 2), "plug in new file player");
     
+    _filePlayers[_filePlayerCount] = unit;
+    _filePlayerCount++;
     
-    UInt64 numPackets;
-    UInt32 propSize = sizeof(numPackets);
-    CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyAudioDataPacketCount, &propSize, &numPackets), "packets");
+    CheckError(AUGraphUpdate(graph, NULL), "update");
     
-    ScheduledAudioFileRegion rgn;
-    memset(&rgn.mTimeStamp, 0, sizeof(rgn.mTimeStamp));
-    rgn.mTimeStamp.mFlags = kAudioTimeStampSampleTimeValid;
-    rgn.mTimeStamp.mSampleTime = 0;
-    rgn.mCompletionProc = NULL; 
-    rgn.mCompletionProcUserData = NULL;
-    rgn.mAudioFile = recordedFile;
-    rgn.mLoopCount = loopCount;
-    rgn.mStartFrame = 0;
-    rgn.mFramesToPlay = 1000000;
-    
-    CheckError(AudioUnitSetProperty(filePlayerUnit, kAudioUnitProperty_ScheduledFileRegion, kAudioUnitScope_Global, 0, &rgn, sizeof(rgn)), "region");
-    
-    AudioTimeStamp startTime;
-    memset(&startTime, 0, sizeof(startTime));
-    startTime.mFlags = kAudioTimeStampSampleTimeValid;
-    startTime.mSampleTime = -1;
-    
-    CheckError(AudioUnitSetProperty(filePlayerUnit, kAudioUnitProperty_ScheduleStartTimeStamp, kAudioUnitScope_Global, 0, &startTime, sizeof(startTime)), "start time");
+    return _filePlayerCount - 1;
 }
 
-- (int)playMusicLoopWithTitle:(NSString *)title
+- (AudioUnit)getFilePlayerForIndex:(int)index
 {
-    if (_loopingState == kLoopingStateSilent) {
-        NSString *filePath = [[NSBundle mainBundle] pathForResource:title ofType:@"m4a"];
-        CFURLRef urlRef = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)filePath, kCFURLPOSIXPathStyle, false);
-        [self playbackURL:urlRef withLoopCount:10];
-        _loopingState = kLoopingStatePlaying;
-        
-    } else if (_loopingState == kLoopingStatePlaying) {
-        AudioUnitParameterEvent event;
-        memset(&event, 0, sizeof(event));
-        event.eventType = kParameterEvent_Ramped;
-        event.element = 1;
-        event.parameter = kMultiChannelMixerParam_Volume;
-        event.scope = kAudioUnitScope_Input;
-        event.eventValues.ramp.startBufferOffset = 0;
-        event.eventValues.ramp.durationInFrames = 1;
-        event.eventValues.ramp.startValue = 1.0;
-        event.eventValues.ramp.endValue = 0.0;
-        
-        //CheckError(AudioUnitScheduleParameters(_finalMixUnit, &event, 1), "scheduled volume change");
-        
-        //CheckError(AudioUnitSetParameter(_finalMixUnit, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, 1, 0.0, 0), "immediate volume change");
-        
-        AudioUnitReset(filePlayerUnit, kAudioUnitScope_Global, 0);
-        
-        _loopingState = kLoopingStateSilent;
-    }
-    
-    return _loopingState;
+    return _filePlayers[index];
+}
+
+- (void)setGain:(Float32)gain forMixerInput:(int)index
+{
+    CheckError(AudioUnitSetParameter(_finalMixUnit, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, index + 2, gain, 0), "mixer gain");
+}
+
+- (void)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnitIndex:(int)index
+{
+    [VLFAudioGraph playbackURL:url withLoopCount:loopCount andUnit:_filePlayers[index]];
+}
+
+- (void)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount
+{
+    [VLFAudioGraph playbackURL:url withLoopCount:loopCount andUnit:filePlayerUnit];
 }
 
 - (void)playbackRecording
@@ -426,6 +432,7 @@ static OSStatus RecordingCallback (void *inRefCon,
 
 - (BOOL)setupAudioSession
 {
+    _filePlayerCount = 0;
     self->recording = NO;
     
     CheckError(AudioSessionInitialize(NULL, kCFRunLoopDefaultMode, InterruptionListener, (__bridge void *)self),
