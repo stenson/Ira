@@ -16,6 +16,6 @@
 - (BOOL)enableGraph;
 - (BOOL)disableGraph;
 - (BOOL)toggleRecording;
-- (void)playMusicLoop;
+- (int)playMusicLoopWithTitle:(NSString *)title;
 
 @end

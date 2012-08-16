@@ -63,7 +63,7 @@
 
 - (void)loopButtonPressed
 {
-    [audioGraph playMusicLoop];
+    [audioGraph playMusicLoopWithTitle:@"doowop"];
 }
 
 - (void)addRecordButton
