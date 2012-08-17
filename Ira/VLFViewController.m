@@ -46,17 +46,18 @@
     NSLog(@"STANDBY STANDBY");
 }
 
-- (void)addLoopButton
+- (void)addLoopButtons
 {
-    [self.view addSubview:[[VLFLoopButton alloc] initWithFrame:CGRectMake(5, 15, 50, 50)
-                                                audioUnitIndex:[audioGraph fetchFilePlayer]
-                                                    audioGraph:audioGraph
-                                                  andLoopTitle:@"doowop"]];
-
-    [self.view addSubview:[[VLFLoopButton alloc] initWithFrame:CGRectMake(105, 15, 50, 50)
-                                                audioUnitIndex:[audioGraph fetchFilePlayer]
-                                                    audioGraph:audioGraph
-                                                  andLoopTitle:@"neworleans"]];
+    int xPosition = 20;
+    NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"neworleans", @"banjo", nil];
+    
+    for (NSString *title in titles) {
+        [self.view addSubview:[[VLFLoopButton alloc] initWithFrame:CGRectMake(xPosition, 350, 45, 45)
+                                                    audioUnitIndex:[audioGraph fetchFilePlayer]
+                                                        audioGraph:audioGraph
+                                                      andLoopTitle:title]];
+        xPosition += 60;
+    }
 }
 
 - (void)addRecordButton
@@ -68,7 +69,7 @@
     record.backgroundColor = [UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.5f];
     record.layer.cornerRadius = 75.0f;
     
-    record.frame = CGRectMake(5, 175, 150, 150);
+    record.frame = CGRectMake(30, 175, 150, 150);
     [[self view] addSubview:record];
     [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
 }
@@ -93,6 +94,11 @@
     }
 }
 
+- (void)addScrollView
+{
+    
+}
+
 - (void)viewDidLoad
 {
     self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"ira"]];
@@ -101,8 +107,9 @@
     [audioGraph setupAudioSession];
     
     [self addRecordButton];
-    [self addStandbyButton];
-    [self addLoopButton];
+    //[self addStandbyButton];
+    [self addLoopButtons];
+    [self addScrollView];
     
     [super viewDidLoad];
 }

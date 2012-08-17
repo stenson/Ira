@@ -7,8 +7,10 @@
 //
 
 #import "VLFAudioGraph.h"
+#include <stdlib.h>
 
 static NSString * const kRecordedFileName = @"%@/recorded-program-output.m4a";
+static Float32 const kMicrophoneGain = 0.10;
 
 @interface VLFAudioGraph () {
     AUGraph graph;
@@ -225,7 +227,7 @@ static OSStatus RecordingCallback (void *inRefCon,
              expansionThreshold: -100
                      attackTime: 0.03
                     releaseTime: 0.0
-                        andGain: 20];
+                        andGain: kMicrophoneGain];
     
     CheckError(AudioUnitSetParameter(lowpassUnit, kLowPassParam_CutoffFrequency, kAudioUnitScope_Global, 0, 20000.0, 0), "cut freq");
 
@@ -331,6 +333,17 @@ static OSStatus RecordingCallback (void *inRefCon,
     [self playbackURL:destinationURL withLoopCount:0];
 }
 
+- (NSString *)generateRecordedOutputFileName
+{
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    NSDateComponents *dc = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit) fromDate:[NSDate date]];
+ 
+    NSString *path = @"%@/";
+    NSString *withDate = [NSString stringWithFormat:@"%i-%i-%i-at-%i-%i-%i.m4a", [dc day], [dc month], [dc year], [dc hour], [dc minute], [dc second]];
+    
+    return [path stringByAppendingString: withDate];
+}
+
 - (BOOL)toggleRecording
 {
     if (self->recording) {
@@ -355,7 +368,7 @@ static OSStatus RecordingCallback (void *inRefCon,
     NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     
-    NSString *destinationFilePath = [[NSString alloc] initWithFormat: kRecordedFileName, documentsDirectory];
+    NSString *destinationFilePath = [[NSString alloc] initWithFormat: [self generateRecordedOutputFileName], documentsDirectory];
     destinationURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)destinationFilePath, kCFURLPOSIXPathStyle, false);
     
     CheckError(ExtAudioFileCreateWithURL(destinationURL, kAudioFileM4AType, &aacASBD, NULL, kAudioFileFlags_EraseFile, &outputFile),

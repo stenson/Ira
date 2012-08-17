@@ -40,9 +40,6 @@ static OSStatus UnitRenderCallback (void *inRefCon,
         VLFLoopButton *button = (__bridge VLFLoopButton *)inRefCon;
         
         if (button->_fadingState != kLoopNotFading && button->_fadingState != kLoopFullVolume) {
-            Float32 fade = button->_fading;
-            printf("FADE %f\n", fade);
-            
             if (button->_fadingState == kLoopFadingIn) {
                 if (button->_fading < 1.0) {
                     button->_fading = button->_fading + 0.001;
@@ -60,7 +57,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
                     AudioUnitReset(button->_unit, kAudioUnitScope_Global, 0);
                 }
             }
-            
+            // set the fade to what we've calculated as the new fade
             [button->_graph setGain:button->_fading forMixerInput:button->_unitIndex];
         }
     }
@@ -74,8 +71,8 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor colorWithRed:0.16f green:0.08f blue:0.84f alpha:0.8f];
-        self.layer.cornerRadius = 25.0f;
+        self.backgroundColor = [UIColor colorWithRed:0.16f green:0.08f blue:0.54f alpha:0.3f];
+        self.layer.cornerRadius = 2.0f;
         
         _unitIndex = index;
         _graph = graph;
@@ -98,11 +95,9 @@ static OSStatus UnitRenderCallback (void *inRefCon,
         if (_fadingState == kLoopFullVolume) {
             _fadingState = kLoopFadingOut;
         } else {
-            NSLog(@"Start the fade curve");
             _fadingState = kLoopFadingOut;
         }
     } else {
-        NSLog(@"PLAY THE LOOP");
         _fadingState = kLoopFadingIn;
         _playing = true;
         _fading = 0.3;
@@ -116,8 +111,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 
 - (void)addCallbacks
 {
-    CheckError(AudioUnitAddRenderNotify(_unit, &UnitRenderCallback, (__bridge void*)self),
-               "unit render notifier");
+    CheckError(AudioUnitAddRenderNotify(_unit, &UnitRenderCallback, (__bridge void*)self), "unit render notifier");
 }
 
 @end
