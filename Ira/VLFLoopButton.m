@@ -57,7 +57,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
                     AudioUnitReset(button->_unit, kAudioUnitScope_Global, 0);
                 }
             }
-            // set the fade to what we've calculated as the new fade
+
             [button->_graph setGain:button->_fading forMixerInput:button->_unitIndex];
         }
     }
@@ -72,7 +72,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = [UIColor colorWithRed:0.16f green:0.08f blue:0.54f alpha:0.3f];
-        self.layer.cornerRadius = 2.0f;
+        self.layer.cornerRadius = 8.0f;
         
         _unitIndex = index;
         _graph = graph;

@@ -13,6 +13,9 @@
     VLFAudioGraph *audioGraph;
     UIButton *standby;
     UIButton *record;
+    
+    UITableView *_recordings;
+    VLFTableViewController *_recordingsController;
 }
 @end
 
@@ -48,15 +51,26 @@
 
 - (void)addLoopButtons
 {
-    int xPosition = 20;
-    NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"neworleans", @"banjo", nil];
+    NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"neworleans", @"banjo", @"fiddle2", nil];
+    int dimension = 80;
+    int outerDimension = 90;
+    int initialXPosition = 11;
+    int xPosition = initialXPosition;
+    int yPosition = 280;
+    int i = 1;
     
     for (NSString *title in titles) {
-        [self.view addSubview:[[VLFLoopButton alloc] initWithFrame:CGRectMake(xPosition, 350, 45, 45)
+        [self.view addSubview:[[VLFLoopButton alloc] initWithFrame:CGRectMake(xPosition, yPosition, dimension, dimension)
                                                     audioUnitIndex:[audioGraph fetchFilePlayer]
                                                         audioGraph:audioGraph
                                                       andLoopTitle:title]];
-        xPosition += 60;
+        if (i % 2 == 0) {
+            yPosition += outerDimension;
+            xPosition = initialXPosition;
+        } else {
+            xPosition += outerDimension;
+        }
+        i++;
     }
 }
 
@@ -66,11 +80,14 @@
     [record setTitle:@"" forState:UIControlStateNormal];
     [record setTitle:@"" forState:UIControlStateSelected];
     [record setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
-    record.backgroundColor = [UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.5f];
-    record.layer.cornerRadius = 75.0f;
+    record.backgroundColor = [UIColor colorWithRed:0.99f green:0.99f blue:0.99f alpha:1.0f];
+    record.layer.borderWidth = 1.0f;
+    record.layer.borderColor = [[UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.45f] CGColor];
+    record.layer.cornerRadius = 85.0f;
     
-    record.frame = CGRectMake(30, 175, 150, 150);
+    record.frame = CGRectMake(12, 100, 170, 170);
     [[self view] addSubview:record];
+
     [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
 }
 
@@ -94,14 +111,16 @@
     }
 }
 
-- (void)addScrollView
+- (void)addTableView
 {
-    
+    _recordingsController = [[VLFTableViewController alloc] initWithStyle:UITableViewStylePlain];
+    [[self view] addSubview:_recordingsController.view];
 }
 
 - (void)viewDidLoad
 {
-    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"ira"]];
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"canvassimple"]];
+    //self.view.backgroundColor = [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1.0];
     
     audioGraph = [[VLFAudioGraph alloc] init];
     [audioGraph setupAudioSession];
@@ -109,7 +128,7 @@
     [self addRecordButton];
     //[self addStandbyButton];
     [self addLoopButtons];
-    [self addScrollView];
+    [self addTableView];
     
     [super viewDidLoad];
 }

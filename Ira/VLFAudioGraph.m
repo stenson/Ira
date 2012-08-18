@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 static NSString * const kRecordedFileName = @"%@/recorded-program-output.m4a";
-static Float32 const kMicrophoneGain = 0.10;
+static Float32 const kMicrophoneGain = 20;
 
 @interface VLFAudioGraph () {
     AUGraph graph;
