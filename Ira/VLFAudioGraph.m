@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 static NSString * const kRecordedFileName = @"%@/recorded-program-output.m4a";
-static Float32 const kMicrophoneGain = 20;
+static Float32 const kMicrophoneGain = 0;
 
 @interface VLFAudioGraph () {
     AUGraph graph;
@@ -462,6 +462,9 @@ static OSStatus RecordingCallback (void *inRefCon,
     
     float aBufferLength = 0.005; // In seconds
     AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration,  sizeof(aBufferLength), &aBufferLength);
+    
+    UInt32 override = kAudioSessionOverrideAudioRoute_Speaker;
+    CheckError(AudioSessionSetProperty(kAudioSessionProperty_OverrideAudioRoute, sizeof(override), &override), "override to speaker");
     
 	if (!inputAvailable) {
 		[self notifyNoInputAvailable];

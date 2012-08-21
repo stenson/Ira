@@ -20,14 +20,12 @@
 		02C2D8A515A5001500C46968 /* ira.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2D8A415A5001500C46968 /* ira.png */; };
 		982188C015DDA5B800DEA89A /* banjo.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 982188BE15DDA5A300DEA89A /* banjo.m4a */; };
 		9821892615DECF2300DEA89A /* VLFTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9821892515DECF2300DEA89A /* VLFTableViewController.m */; };
+		9866BE3615E20AAC00616193 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9866BE3515E20AAC00616193 /* QuartzCore.framework */; };
 		9899994915D0E2AF001CEB68 /* neworleans.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9899994815D0D7AC001CEB68 /* neworleans.m4a */; };
 		989A492415DAF86B0093ECAC /* doowop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 989A492315DAF8600093ECAC /* doowop.m4a */; };
 		989A493615DD1F130093ECAC /* VLFLoopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 989A493515DD1F130093ECAC /* VLFLoopButton.m */; };
 		98A3CBD115CB86C000C13711 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98A3CBD015CB86C000C13711 /* AVFoundation.framework */; };
 		98ED2A4C15DEEC950035A53B /* fiddle2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A4B15DEEC840035A53B /* fiddle2.m4a */; };
-		98ED2A5015DEF1660035A53B /* canvas.png in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A4F15DEF1660035A53B /* canvas.png */; };
-		98ED2A5215DEF1D00035A53B /* canvas.png in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A5115DEF1D00035A53B /* canvas.png */; };
-		98ED2A5415DEF3DA0035A53B /* canvaslines.png in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A5315DEF3DA0035A53B /* canvaslines.png */; };
 		98ED2A5615DF00C80035A53B /* canvassimple.png in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A5515DF00C80035A53B /* canvassimple.png */; };
 /* End PBXBuildFile section */
 
@@ -52,6 +50,7 @@
 		982188BE15DDA5A300DEA89A /* banjo.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = banjo.m4a; path = ../../banjo.m4a; sourceTree = "<group>"; };
 		9821892415DECF2300DEA89A /* VLFTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFTableViewController.h; sourceTree = "<group>"; };
 		9821892515DECF2300DEA89A /* VLFTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFTableViewController.m; sourceTree = "<group>"; };
+		9866BE3515E20AAC00616193 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFAudioUtilities.h; sourceTree = "<group>"; };
 		9899994815D0D7AC001CEB68 /* neworleans.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = neworleans.m4a; sourceTree = "<group>"; };
 		989A492315DAF8600093ECAC /* doowop.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = doowop.m4a; path = "../../../Library/Application Support/iPhone Simulator/5.1/Applications/078F6802-F339-429D-92C8-7DE4FB47B4C4/Documents/doowop.m4a"; sourceTree = "<group>"; };
@@ -59,9 +58,6 @@
 		989A493515DD1F130093ECAC /* VLFLoopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFLoopButton.m; sourceTree = "<group>"; };
 		98A3CBD015CB86C000C13711 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		98ED2A4B15DEEC840035A53B /* fiddle2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = fiddle2.m4a; path = ../../fiddle2.m4a; sourceTree = "<group>"; };
-		98ED2A4F15DEF1660035A53B /* canvas.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = canvas.png; path = ../../canvas.png; sourceTree = "<group>"; };
-		98ED2A5115DEF1D00035A53B /* canvas.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = canvas.png; path = ../../canvas.png; sourceTree = "<group>"; };
-		98ED2A5315DEF3DA0035A53B /* canvaslines.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = canvaslines.png; path = ../../canvaslines.png; sourceTree = "<group>"; };
 		98ED2A5515DF00C80035A53B /* canvassimple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = canvassimple.png; path = ../../canvassimple.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -70,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9866BE3615E20AAC00616193 /* QuartzCore.framework in Frameworks */,
 				98A3CBD115CB86C000C13711 /* AVFoundation.framework in Frameworks */,
 				02C2D8A315A4B46E00C46968 /* AudioToolbox.framework in Frameworks */,
 				02C2D87F15A4A92000C46968 /* UIKit.framework in Frameworks */,
@@ -84,6 +81,7 @@
 		02C2D86F15A4A92000C46968 = {
 			isa = PBXGroup;
 			children = (
+				9866BE3515E20AAC00616193 /* QuartzCore.framework */,
 				98A3CBD015CB86C000C13711 /* AVFoundation.framework */,
 				02C2D8A215A4B46E00C46968 /* AudioToolbox.framework */,
 				02C2D88415A4A92000C46968 /* Ira */,
@@ -134,9 +132,6 @@
 			isa = PBXGroup;
 			children = (
 				98ED2A5515DF00C80035A53B /* canvassimple.png */,
-				98ED2A5315DEF3DA0035A53B /* canvaslines.png */,
-				98ED2A5115DEF1D00035A53B /* canvas.png */,
-				98ED2A4F15DEF1660035A53B /* canvas.png */,
 				98ED2A4B15DEEC840035A53B /* fiddle2.m4a */,
 				982188BE15DDA5A300DEA89A /* banjo.m4a */,
 				989A492315DAF8600093ECAC /* doowop.m4a */,
@@ -208,9 +203,6 @@
 				02C2D88915A4A92000C46968 /* InfoPlist.strings in Resources */,
 				02C2D89515A4A92000C46968 /* VLFViewController.xib in Resources */,
 				02C2D8A515A5001500C46968 /* ira.png in Resources */,
-				98ED2A5015DEF1660035A53B /* canvas.png in Resources */,
-				98ED2A5215DEF1D00035A53B /* canvas.png in Resources */,
-				98ED2A5415DEF3DA0035A53B /* canvaslines.png in Resources */,
 				98ED2A5615DF00C80035A53B /* canvassimple.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
