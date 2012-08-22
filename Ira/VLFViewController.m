@@ -51,7 +51,7 @@
 
 - (void)addLoopButtons
 {
-    NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"neworleans", @"banjo", @"fiddle2", nil];
+    NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"neworleans", @"ukulele", @"fiddle2", nil];
     int dimension = 80;
     int outerDimension = 90;
     int initialXPosition = 11;

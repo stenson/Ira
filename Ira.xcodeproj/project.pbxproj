@@ -21,6 +21,8 @@
 		982188C015DDA5B800DEA89A /* banjo.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 982188BE15DDA5A300DEA89A /* banjo.m4a */; };
 		9821892615DECF2300DEA89A /* VLFTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9821892515DECF2300DEA89A /* VLFTableViewController.m */; };
 		9866BE3615E20AAC00616193 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9866BE3515E20AAC00616193 /* QuartzCore.framework */; };
+		9866BE3B15E495F700616193 /* canvassimple@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3A15E495F700616193 /* canvassimple@2x.png */; };
+		9866BE3D15E4AB7A00616193 /* ukulele.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3C15E4AB6000616193 /* ukulele.m4a */; };
 		9899994915D0E2AF001CEB68 /* neworleans.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9899994815D0D7AC001CEB68 /* neworleans.m4a */; };
 		989A492415DAF86B0093ECAC /* doowop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 989A492315DAF8600093ECAC /* doowop.m4a */; };
 		989A493615DD1F130093ECAC /* VLFLoopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 989A493515DD1F130093ECAC /* VLFLoopButton.m */; };
@@ -51,6 +53,8 @@
 		9821892415DECF2300DEA89A /* VLFTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFTableViewController.h; sourceTree = "<group>"; };
 		9821892515DECF2300DEA89A /* VLFTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFTableViewController.m; sourceTree = "<group>"; };
 		9866BE3515E20AAC00616193 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		9866BE3A15E495F700616193 /* canvassimple@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "canvassimple@2x.png"; path = "../../canvassimple@2x.png"; sourceTree = "<group>"; };
+		9866BE3C15E4AB6000616193 /* ukulele.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = ukulele.m4a; path = ../../ukulele.m4a; sourceTree = "<group>"; };
 		9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFAudioUtilities.h; sourceTree = "<group>"; };
 		9899994815D0D7AC001CEB68 /* neworleans.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = neworleans.m4a; sourceTree = "<group>"; };
 		989A492315DAF8600093ECAC /* doowop.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = doowop.m4a; path = "../../../Library/Application Support/iPhone Simulator/5.1/Applications/078F6802-F339-429D-92C8-7DE4FB47B4C4/Documents/doowop.m4a"; sourceTree = "<group>"; };
@@ -131,6 +135,8 @@
 		02C2D88515A4A92000C46968 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				9866BE3C15E4AB6000616193 /* ukulele.m4a */,
+				9866BE3A15E495F700616193 /* canvassimple@2x.png */,
 				98ED2A5515DF00C80035A53B /* canvassimple.png */,
 				98ED2A4B15DEEC840035A53B /* fiddle2.m4a */,
 				982188BE15DDA5A300DEA89A /* banjo.m4a */,
@@ -196,6 +202,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9866BE3D15E4AB7A00616193 /* ukulele.m4a in Resources */,
 				98ED2A4C15DEEC950035A53B /* fiddle2.m4a in Resources */,
 				982188C015DDA5B800DEA89A /* banjo.m4a in Resources */,
 				989A492415DAF86B0093ECAC /* doowop.m4a in Resources */,
@@ -204,6 +211,7 @@
 				02C2D89515A4A92000C46968 /* VLFViewController.xib in Resources */,
 				02C2D8A515A5001500C46968 /* ira.png in Resources */,
 				98ED2A5615DF00C80035A53B /* canvassimple.png in Resources */,
+				9866BE3B15E495F700616193 /* canvassimple@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
