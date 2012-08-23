@@ -14,6 +14,7 @@ static UInt32 const kLoopFadingOut = 2;
 static UInt32 const kLoopFullVolume = 3;
 
 static Float32 const kDragGainLowerBound = 0.1;
+static double const kTapTolerance = 0.1;
 
 @interface VLFLoopButton () {
     VLFAudioGraph *_graph;
@@ -23,7 +24,6 @@ static Float32 const kDragGainLowerBound = 0.1;
     AudioUnit _unit;
     CFURLRef _loopURLRef;
     
-    BOOL _dragging;
     BOOL _playing;
     Float32 _gain;
     Float32 _fadingState;
@@ -76,6 +76,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 {
     self = [super initWithFrame:frame];
     if (self) {
+        self.backgroundColor = [UIColor colorWithRed:0.54 green:0.74 blue:0.64 alpha:0.1];
         [self addGainLayerGivenFrame:frame];
 
 //        self.backgroundColor = [UIColor colorWithRed:0.8f green:0.9f blue:0.8f alpha:0.1];
@@ -83,12 +84,16 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 //        self.layer.borderWidth = 1.0f;
 //        self.layer.borderColor = [[self borderColor] CGColor];
         
-//        self.layer.shadowOffset = CGSizeMake(0, 1);
-//        self.layer.shadowColor = [[UIColor darkGrayColor] CGColor];
-//        self.layer.shadowRadius = 1.0;
-//        self.layer.shadowOpacity = 0.2;
+        self.layer.shadowOffset = CGSizeMake(0, 1);
+        self.layer.shadowColor = [[UIColor darkGrayColor] CGColor];
+        self.layer.shadowRadius = 1.0;
+        self.layer.shadowOpacity = 0.2;
         
-        _dragging = NO;
+        self.layer.cornerRadius = 1.0;
+        
+        self.layer.borderWidth = 1.0f;
+        self.layer.borderColor = [[UIColor colorWithWhite:0.5 alpha:1.0] CGColor];
+        
         _unitIndex = index;
         _graph = graph;
         _playing = false;
@@ -113,10 +118,8 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    _dragging = YES;
+{    
     _fadingState = kLoopFullVolume;
-    
     [self setGainWithTouches:touches];
 }
 
@@ -133,8 +136,6 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 //    } else if (!_dragging) {
 //        //[self simpleButtonPressedWithFade:YES];
 //    }
-    
-    _dragging = NO;
 }
 
 #pragma mark private
@@ -167,33 +168,36 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 
 - (void)addGainLayerGivenFrame:(CGRect)frame
 {
-    CALayer *circle = [CALayer layer];
-    circle.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
-    circle.borderWidth = 1.0f;
-    circle.borderColor = [[self borderColor] CGColor];
+//    CGColorRef borderColor = [[UIColor colorWithWhite:0.5 alpha:1.0] CGColor];
+//    
+//    CALayer *circle = [CALayer layer];
+//    circle.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+//    circle.borderWidth = 1.0f;
+//    circle.borderColor = borderColor;
+//    
+//    circle.shadowOffset = CGSizeMake(0, 0);
+//    circle.shadowColor = [[UIColor blackColor] CGColor];
+//    circle.shadowRadius = 1.0;
+//    circle.shadowOpacity = 0.5;
     
-    circle.shadowOffset = CGSizeMake(0, 1);
-    circle.shadowColor = [[UIColor darkGrayColor] CGColor];
-    circle.shadowRadius = 1.0;
-    circle.shadowOpacity = 0.2;
+    CGFloat red = 0.56;
+    CGFloat green = 0.78f;
+    CGFloat blue = 0.64f;
     
     _gainLayer = [CALayer layer];
     _gainLayer.frame = CGRectMake(-2, frame.size.height, frame.size.width + 2, frame.size.height + 2);
-    _gainLayer.backgroundColor = [[UIColor colorWithRed:0.56f green:0.78f blue:0.64f alpha:0.2] CGColor];
+    _gainLayer.backgroundColor = [[UIColor colorWithRed:red green:green blue:blue alpha:0.3] CGColor];
     
     _gainLayer.borderWidth = 1.0;
-    _gainLayer.borderColor = [[self borderColor] CGColor];
+    _gainLayer.borderColor = [[UIColor blackColor] CGColor];
     
     _gainLayer.shadowOffset = CGSizeMake(0, 1);
-    _gainLayer.shadowColor = [[UIColor darkGrayColor] CGColor];
+    _gainLayer.shadowColor = [[UIColor blackColor] CGColor];
     _gainLayer.shadowRadius = 1.0;
-    _gainLayer.shadowOpacity = 0.2;
+    _gainLayer.shadowOpacity = 0.3;
     
-//    _gainLayer.borderWidth = 1.0f;
-//    _gainLayer.borderColor = [[UIColor colorWithWhite:0.3 alpha:1.0] CGColor];
-    
+    //[self.layer insertSublayer:circle above:self.layer];
     [self.layer insertSublayer:_gainLayer above:self.layer];
-    [self.layer insertSublayer:circle above:self.layer];
     
     self.layer.masksToBounds = YES;
 }

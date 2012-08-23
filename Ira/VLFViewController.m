@@ -56,7 +56,7 @@
     int outerDimension = 90;
     int initialXPosition = 11;
     int xPosition = initialXPosition;
-    int yPosition = 280;
+    int yPosition = 170;
     int i = 1;
     
     for (NSString *title in titles) {
@@ -78,14 +78,21 @@
 {
     record = [UIButton buttonWithType:UIButtonTypeCustom];
     [record setTitle:@"" forState:UIControlStateNormal];
-    [record setTitle:@"" forState:UIControlStateSelected];
     [record setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
-    record.backgroundColor = [UIColor colorWithRed:0.99f green:0.99f blue:0.99f alpha:1.0f];
-    record.layer.borderWidth = 1.0f;
-    record.layer.borderColor = [[UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.45f] CGColor];
-    record.layer.cornerRadius = 85.0f;
     
-    record.frame = CGRectMake(12, 100, 170, 170);
+    record.backgroundColor = [UIColor colorWithRed:0.96f green:0.28f blue:0.34f alpha:0.3f];
+    
+    record.layer.borderWidth = 1.0f;
+    record.layer.borderColor = [[UIColor colorWithWhite:0.4 alpha:0.8] CGColor];
+    
+    record.layer.shadowOffset = CGSizeMake(0, 0);
+    record.layer.shadowRadius = 0.0;
+    record.layer.shadowColor = [[UIColor darkGrayColor] CGColor];
+    record.layer.shadowOpacity = 0.5;
+    
+    record.layer.masksToBounds = YES;
+    
+    record.frame = CGRectMake(11, 370, 170, 80);
     [[self view] addSubview:record];
 
     [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
@@ -107,7 +114,7 @@
     if (state) {
         [self animateButton:record toColor:[UIColor colorWithRed:0.96f green:0.18f blue:0.34f alpha:1.0f]];
     } else {
-        [self animateButton:record toColor:[UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.5f]];
+        [self animateButton:record toColor:[UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.1f]];
     }
 }
 
@@ -120,13 +127,11 @@
 - (void)viewDidLoad
 {
     self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"canvassimple"]];
-    //self.view.backgroundColor = [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1.0];
     
     audioGraph = [[VLFAudioGraph alloc] init];
     [audioGraph setupAudioSession];
     
     [self addRecordButton];
-    //[self addStandbyButton];
     [self addLoopButtons];
     [self addTableView];
     
@@ -140,7 +145,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    return interfaceOrientation == UIInterfaceOrientationPortrait;
 }
 
 
