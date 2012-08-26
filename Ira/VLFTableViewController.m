@@ -28,12 +28,6 @@
 {
     [super viewDidLoad];
     
-    CGSize size = [[UIScreen mainScreen] bounds].size;
-    CGFloat fifth = size.width/5;
-    
-    self.tableView.frame = CGRectMake(fifth*3, 0, fifth*2, size.height);
-    self.tableView.backgroundColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0];
-    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
  

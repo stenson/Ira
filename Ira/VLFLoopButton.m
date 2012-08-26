@@ -27,6 +27,10 @@ static double const kTapTolerance = 0.1;
     BOOL _playing;
     Float32 _gain;
     Float32 _fadingState;
+    UInt32 _framesToPlay;
+    UInt32 _framesPlayed;
+    
+    BOOL _dragging;
 }
 
 - (void)setGainWithValue:(Float32)gain;
@@ -46,25 +50,43 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     if (*ioActionFlags & kAudioUnitRenderAction_PostRender) {
         VLFLoopButton *button = (__bridge VLFLoopButton *)inRefCon;
         
-        if (button->_fadingState != kLoopNotFading && button->_fadingState != kLoopFullVolume) {
-            if (button->_fadingState == kLoopFadingIn) {
-                if (button->_gain < 1.0) {
-                    button->_gain = button->_gain + 0.009;
-                } else {
-                    button->_fadingState = kLoopFullVolume;
-                    button->_gain = 1.0;
-                }
-            } else if (button->_fadingState == kLoopFadingOut) {
-                if (button->_gain > 0.0) {
-                    button->_gain = button->_gain - 0.005;
-                } else {
-                    button->_fadingState = kLoopNotFading;
-                    button->_gain = 0.0;
-                }
-            }
+        if (!(*ioActionFlags & kAudioUnitRenderAction_OutputIsSilence)) {
+            //printf("%f\n", inTimeStamp->m);
             
-            [button setGainWithValue:button->_gain];
+            AudioTimeStamp playTime;
+            UInt32 pSize = sizeof(playTime);
+            CheckError(AudioUnitGetProperty(button->_unit, kAudioUnitProperty_CurrentPlayTime, kAudioUnitScope_Global, 0, &playTime, &pSize), "current play time");
+            
+            printf("%f\n", playTime.mSampleTime);
+            
+//            if (button->_framesPlayed > button->_framesToPlay) {
+//                printf("diff %lu\n", button->_framesPlayed - button->_framesToPlay);
+//                button->_framesPlayed = button->_framesPlayed - button->_framesToPlay;
+//                printf("%f\n", (Float32)button->_framesPlayed / (Float32)button->_framesToPlay);
+//            } else {
+//                button->_framesPlayed += inNumberFrames;
+//            }
         }
+        
+//        if (button->_fadingState != kLoopNotFading && button->_fadingState != kLoopFullVolume) {
+//            if (button->_fadingState == kLoopFadingIn) {
+//                if (button->_gain < 1.0) {
+//                    button->_gain = button->_gain + 0.009;
+//                } else {
+//                    button->_fadingState = kLoopFullVolume;
+//                    button->_gain = 1.0;
+//                }
+//            } else if (button->_fadingState == kLoopFadingOut) {
+//                if (button->_gain > 0.0) {
+//                    button->_gain = button->_gain - 0.005;
+//                } else {
+//                    button->_fadingState = kLoopNotFading;
+//                    button->_gain = 0.0;
+//                }
+//            }
+//            
+//            [button setGainWithValue:button->_gain];
+//        }
     }
     
     return noErr;
@@ -76,29 +98,27 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor colorWithRed:0.54 green:0.74 blue:0.64 alpha:0.1];
-        [self addGainLayerGivenFrame:frame];
-
-//        self.backgroundColor = [UIColor colorWithRed:0.8f green:0.9f blue:0.8f alpha:0.1];
-//        self.layer.cornerRadius = self.frame.size.height / 2;
-//        self.layer.borderWidth = 1.0f;
-//        self.layer.borderColor = [[self borderColor] CGColor];
+        self.backgroundColor = [UIColor colorWithRed:0.54 green:0.74 blue:0.64 alpha:0.2];
         
-        self.layer.shadowOffset = CGSizeMake(0, 1);
+        self.layer.shadowOffset = CGSizeMake(0, 0);
         self.layer.shadowColor = [[UIColor darkGrayColor] CGColor];
         self.layer.shadowRadius = 1.0;
-        self.layer.shadowOpacity = 0.2;
+        self.layer.shadowOpacity = 0.4;
         
         self.layer.cornerRadius = 1.0;
         
         self.layer.borderWidth = 1.0f;
-        self.layer.borderColor = [[UIColor colorWithWhite:0.5 alpha:1.0] CGColor];
+        self.layer.borderColor = [[UIColor colorWithWhite:0.4 alpha:0.6] CGColor];
+        
+        [self addGainLayerGivenFrame:frame];
         
         _unitIndex = index;
         _graph = graph;
-        _playing = false;
+        _playing = NO;
         _gain = 0.0;
         _unit = [_graph getFilePlayerForIndex:_unitIndex];
+        
+        _framesPlayed = 0;
         
         NSString *filePath = [[NSBundle mainBundle] pathForResource:loopTitle ofType:@"m4a"];
         _loopURLRef = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)filePath, kCFURLPOSIXPathStyle, false);
@@ -110,15 +130,21 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    _dragging = NO;
     [self setGainWithTouches:touches];
     
     if (!_playing) {
-        [self playLoop];
+        [self performSelector:@selector(playLoop) withObject:self afterDelay:0.1];
     }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {    
+    if (!_playing) {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self];
+        [self playLoop];
+    }
+    _dragging = YES;
     _fadingState = kLoopFullVolume;
     [self setGainWithTouches:touches];
 }
@@ -148,12 +174,13 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 - (void)playLoop
 {
     _playing = YES;
-    [_graph playbackURL:_loopURLRef withLoopCount:100 andUnitIndex:_unitIndex];
+    _framesToPlay = [_graph playbackURL:_loopURLRef withLoopCount:100 andUnitIndex:_unitIndex];
 }
 
 - (void)stopLoop
 {
     _playing = NO;
+    _framesPlayed = 0;
     AudioUnitReset(_unit, kAudioUnitScope_Global, 0);
 }
 
@@ -168,36 +195,28 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 
 - (void)addGainLayerGivenFrame:(CGRect)frame
 {
-//    CGColorRef borderColor = [[UIColor colorWithWhite:0.5 alpha:1.0] CGColor];
-//    
-//    CALayer *circle = [CALayer layer];
-//    circle.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
-//    circle.borderWidth = 1.0f;
-//    circle.borderColor = borderColor;
-//    
-//    circle.shadowOffset = CGSizeMake(0, 0);
-//    circle.shadowColor = [[UIColor blackColor] CGColor];
-//    circle.shadowRadius = 1.0;
-//    circle.shadowOpacity = 0.5;
-    
-    CGFloat red = 0.56;
-    CGFloat green = 0.78f;
-    CGFloat blue = 0.64f;
+    CGFloat red = 0.57;
+    CGFloat green = 0.67;
+    CGFloat blue = 0.79;
     
     _gainLayer = [CALayer layer];
-    _gainLayer.frame = CGRectMake(-2, frame.size.height, frame.size.width + 2, frame.size.height + 2);
-    _gainLayer.backgroundColor = [[UIColor colorWithRed:red green:green blue:blue alpha:0.3] CGColor];
+    _gainLayer.frame = CGRectMake(0, frame.size.height - 4, frame.size.width, frame.size.height);
+    _gainLayer.backgroundColor = [[UIColor colorWithRed:red green:green blue:blue alpha:0.2] CGColor];
     
-    _gainLayer.borderWidth = 1.0;
-    _gainLayer.borderColor = [[UIColor blackColor] CGColor];
+//    _gainLayer.shadowOffset = CGSizeMake(0, 1);
+//    _gainLayer.shadowColor = [[UIColor darkGrayColor] CGColor];
+//    _gainLayer.shadowRadius = 1.0;
+//    _gainLayer.shadowOpacity = 0.2;
     
-    _gainLayer.shadowOffset = CGSizeMake(0, 1);
-    _gainLayer.shadowColor = [[UIColor blackColor] CGColor];
-    _gainLayer.shadowRadius = 1.0;
-    _gainLayer.shadowOpacity = 0.3;
+    CALayer *handle = [CALayer layer];
+    handle.frame = CGRectMake(0, 0, _gainLayer.frame.size.width, 1);
+    handle.borderWidth = 1.0;
+    handle.borderColor = [[UIColor colorWithWhite:0.5 alpha:0.9] CGColor];
+    //handle.backgroundColor = [[UIColor whiteColor] CGColor];
+    handle.backgroundColor = [[UIColor colorWithPatternImage:[UIImage imageNamed:@"canvassimple"]] CGColor];
     
-    //[self.layer insertSublayer:circle above:self.layer];
-    [self.layer insertSublayer:_gainLayer above:self.layer];
+    [_gainLayer addSublayer:handle];
+    [self.layer addSublayer:_gainLayer];
     
     self.layer.masksToBounds = YES;
 }
@@ -207,21 +226,23 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     _gain = gain;
     [_graph setGain:_gain forMixerInput:_unitIndex];
     
-//    if (_gain == 0.0) {
-//        NSLog(@"DOING THIS");
-//        _playing = false;
-//        AudioUnitReset(_unit, kAudioUnitScope_Global, 0);
-//    }
-    
     [self repositionGainLayerWithGain:_gain];
 }
 
 - (void)repositionGainLayerWithGain:(Float32)gain
 {
-    [CATransaction begin];
-    [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
-    _gainLayer.frame = CGRectMake(0, _gainLayer.frame.size.height * (1.0 - gain), _gainLayer.frame.size.width, _gainLayer.frame.size.height);
-    [CATransaction commit];
+    CGFloat yPosition = (_gainLayer.frame.size.height - 4) * (1.0 - gain);
+    
+    if (_dragging) {
+        [CATransaction begin];
+        [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
+    }
+    
+    _gainLayer.frame = CGRectMake(0, MAX(yPosition, 3), _gainLayer.frame.size.width, _gainLayer.frame.size.height);
+    
+    if (_dragging) {
+        [CATransaction commit];
+    }
 }
 
 - (void)simpleButtonPressedWithFade:(BOOL)shouldFade

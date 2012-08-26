@@ -20,7 +20,7 @@ static Float32 const kMicrophoneGain = 20;
     AUNode _finalMix;
     CFURLRef destinationURL;
     ExtAudioFileRef outputFile;
-    AudioStreamBasicDescription aacASBD;
+    AudioStreamBasicDescription _aacASBD;
     AudioStreamBasicDescription _notifierASBD;
     
     AudioUnit _filePlayers[4];
@@ -34,7 +34,7 @@ static Float32 const kMicrophoneGain = 20;
 
 @implementation VLFAudioGraph
 
-+ (BOOL)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnit:(AudioUnit)unit
++ (UInt32)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnit:(AudioUnit)unit
 {
     AudioFileID recordedFile;
     CheckError(AudioFileOpenURL(url, kAudioFileReadPermission, 0, &recordedFile), "read");
@@ -47,16 +47,29 @@ static Float32 const kMicrophoneGain = 20;
     UInt32 propSize = sizeof(numPackets);
     CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyAudioDataPacketCount, &propSize, &numPackets), "packets");
     
+    AudioStreamBasicDescription fileASBD;
+    UInt32 asbdSize = sizeof(fileASBD);
+    CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyDataFormat, &asbdSize, &fileASBD), "file format");
+    
+    UInt32 framesToPlay = numPackets * fileASBD.mFramesPerPacket;
+    fileASBD.mBytesPerFrame
+    
+    UInt32 duration;
+    UInt32 dSize = sizeof(duration);
+    CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyEstimatedDuration, &dSize, &duration), "duration");
+    
+    printf("DURATION %lu\n", duration);
+    
     ScheduledAudioFileRegion rgn;
     memset(&rgn.mTimeStamp, 0, sizeof(rgn.mTimeStamp));
     rgn.mTimeStamp.mFlags = kAudioTimeStampSampleTimeValid;
     rgn.mTimeStamp.mSampleTime = 0;
-    rgn.mCompletionProc = NULL; 
+    rgn.mCompletionProc = FileCompleteCallback; 
     rgn.mCompletionProcUserData = NULL;
     rgn.mAudioFile = recordedFile;
     rgn.mLoopCount = loopCount;
     rgn.mStartFrame = 0;
-    rgn.mFramesToPlay = 1000000;
+    rgn.mFramesToPlay = framesToPlay;
     
     CheckError(AudioUnitSetProperty(unit, kAudioUnitProperty_ScheduledFileRegion, kAudioUnitScope_Global, 0, &rgn, sizeof(rgn)), "region");
     
@@ -68,7 +81,7 @@ static Float32 const kMicrophoneGain = 20;
     CheckError(AudioUnitSetProperty(unit, kAudioUnitProperty_ScheduleStartTimeStamp, kAudioUnitScope_Global, 0, &startTime, sizeof(startTime)),
                "start time");
     
-    return YES;
+    return framesToPlay;
 }
 
 static void InterruptionListener (void *inUserData, UInt32 inInterruptionState) {
@@ -92,10 +105,10 @@ static OSStatus RecordingCallback (void *inRefCon,
     return noErr;
 }
 
-//static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *bufferList, OSStatus status)
-//{
-//    NSLog(@"File COMPLETE");
-//}
+static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *bufferList, OSStatus status)
+{
+    NSLog(@"File COMPLETE");
+}
 
 - (void)notifyNoInputAvailable
 {
@@ -287,7 +300,7 @@ static OSStatus RecordingCallback (void *inRefCon,
     // to headphones
     CheckError(AUGraphConnectNodeInput(graph, _finalMix, 0, rio, 0), "plug");
     
-    aacASBD = [self getAACFormat];
+    _aacASBD = [self getAACFormat];
     
     [self enableGraph];
 }
@@ -318,9 +331,9 @@ static OSStatus RecordingCallback (void *inRefCon,
     CheckError(AudioUnitSetParameter(_finalMixUnit, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, index + 2, gain, 0), "mixer gain");
 }
 
-- (void)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnitIndex:(int)index
+- (UInt32)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnitIndex:(int)index
 {
-    [VLFAudioGraph playbackURL:url withLoopCount:loopCount andUnit:_filePlayers[index]];
+    return [VLFAudioGraph playbackURL:url withLoopCount:loopCount andUnit:_filePlayers[index]];
 }
 
 - (void)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount
@@ -371,7 +384,7 @@ static OSStatus RecordingCallback (void *inRefCon,
     NSString *destinationFilePath = [[NSString alloc] initWithFormat: [self generateRecordedOutputFileName], documentsDirectory];
     destinationURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)destinationFilePath, kCFURLPOSIXPathStyle, false);
     
-    CheckError(ExtAudioFileCreateWithURL(destinationURL, kAudioFileM4AType, &aacASBD, NULL, kAudioFileFlags_EraseFile, &outputFile),
+    CheckError(ExtAudioFileCreateWithURL(destinationURL, kAudioFileM4AType, &_aacASBD, NULL, kAudioFileFlags_EraseFile, &outputFile),
                "create ext audio output file");
     
     CheckError(ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ClientDataFormat, sizeof(_notifierASBD), &_notifierASBD),

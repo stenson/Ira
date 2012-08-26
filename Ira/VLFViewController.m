@@ -54,16 +54,19 @@
     NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"neworleans", @"ukulele", @"fiddle2", nil];
     int dimension = 80;
     int outerDimension = 90;
-    int initialXPosition = 11;
+    int initialXPosition = 45;
     int xPosition = initialXPosition;
-    int yPosition = 170;
+    int yPosition = 240;
     int i = 1;
     
     for (NSString *title in titles) {
-        [self.view addSubview:[[VLFLoopButton alloc] initWithFrame:CGRectMake(xPosition, yPosition, dimension, dimension)
-                                                    audioUnitIndex:[audioGraph fetchFilePlayer]
-                                                        audioGraph:audioGraph
-                                                      andLoopTitle:title]];
+        VLFLoopButton *button = [[VLFLoopButton alloc] initWithFrame:CGRectMake(xPosition, yPosition, dimension, dimension)
+                                                      audioUnitIndex:[audioGraph fetchFilePlayer]
+                                                          audioGraph:audioGraph
+                                                        andLoopTitle:title];
+        
+        [self.view addSubview:button];
+        
         if (i % 2 == 0) {
             yPosition += outerDimension;
             xPosition = initialXPosition;
@@ -82,6 +85,8 @@
     
     record.backgroundColor = [UIColor colorWithRed:0.96f green:0.28f blue:0.34f alpha:0.3f];
     
+    record.layer.cornerRadius = 170/2;
+    
     record.layer.borderWidth = 1.0f;
     record.layer.borderColor = [[UIColor colorWithWhite:0.4 alpha:0.8] CGColor];
     
@@ -92,7 +97,7 @@
     
     record.layer.masksToBounds = YES;
     
-    record.frame = CGRectMake(11, 370, 170, 80);
+    record.frame = CGRectMake(45, 30, 170, 170);
     [[self view] addSubview:record];
 
     [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
@@ -109,7 +114,6 @@
 - (void)recordPressed
 {
     BOOL state = [audioGraph toggleRecording];
-    NSLog(@"state %d", state);
     
     if (state) {
         [self animateButton:record toColor:[UIColor colorWithRed:0.96f green:0.18f blue:0.34f alpha:1.0f]];
@@ -121,6 +125,18 @@
 - (void)addTableView
 {
     _recordingsController = [[VLFTableViewController alloc] initWithStyle:UITableViewStylePlain];
+    
+    CGSize size = [[UIScreen mainScreen] bounds].size;
+    CGFloat fifth = size.width/5;
+    
+    _recordingsController.tableView.frame = CGRectMake(fifth*4, 0, fifth*2, size.height);
+    _recordingsController.tableView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+    
+    _recordingsController.tableView.layer.shadowOffset = CGSizeMake(0, 0);
+    _recordingsController.tableView.layer.shadowColor = [[UIColor blackColor] CGColor];
+    _recordingsController.tableView.layer.shadowOpacity = 0.5;
+    _recordingsController.tableView.layer.shadowRadius = 1.0;
+    
     [[self view] addSubview:_recordingsController.view];
 }
 
@@ -134,6 +150,18 @@
     [self addRecordButton];
     [self addLoopButtons];
     [self addTableView];
+    
+    CGRect bounds = [[UIScreen mainScreen] bounds];
+    
+    UIView *bottomBar = [[UIView alloc] initWithFrame:CGRectMake(0, bounds.size.height - 50, bounds.size.width, 40)];
+    bottomBar.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
+    
+    bottomBar.layer.shadowOffset = CGSizeMake(0, 0);
+    bottomBar.layer.shadowColor = [[UIColor blackColor] CGColor];
+    bottomBar.layer.shadowOpacity = 0.4;
+    bottomBar.layer.shadowRadius = 1.0;
+    
+    [self.view addSubview:bottomBar];
     
     [super viewDidLoad];
 }
