@@ -25,6 +25,7 @@ static double const kTapTolerance = 0.1;
     CFURLRef _loopURLRef;
     
     BOOL _playing;
+    Float32 _percentagePlayed;
     Float32 _gain;
     Float32 _fadingState;
     UInt32 _framesToPlay;
@@ -37,6 +38,8 @@ static double const kTapTolerance = 0.1;
 @end
 
 @implementation VLFLoopButton
+
+@synthesize progressCircle = _progressCircle;
 
 #pragma mark callbacks
 
@@ -51,21 +54,13 @@ static OSStatus UnitRenderCallback (void *inRefCon,
         VLFLoopButton *button = (__bridge VLFLoopButton *)inRefCon;
         
         if (!(*ioActionFlags & kAudioUnitRenderAction_OutputIsSilence)) {
-            //printf("%f\n", inTimeStamp->m);
             
             AudioTimeStamp playTime;
             UInt32 pSize = sizeof(playTime);
             CheckError(AudioUnitGetProperty(button->_unit, kAudioUnitProperty_CurrentPlayTime, kAudioUnitScope_Global, 0, &playTime, &pSize), "current play time");
             
-            printf("%f\n", playTime.mSampleTime);
-            
-//            if (button->_framesPlayed > button->_framesToPlay) {
-//                printf("diff %lu\n", button->_framesPlayed - button->_framesToPlay);
-//                button->_framesPlayed = button->_framesPlayed - button->_framesToPlay;
-//                printf("%f\n", (Float32)button->_framesPlayed / (Float32)button->_framesToPlay);
-//            } else {
-//                button->_framesPlayed += inNumberFrames;
-//            }
+            UInt32 playedFrames = playTime.mSampleTime;
+            button->_percentagePlayed = (Float32)(playedFrames % button->_framesToPlay) / button->_framesToPlay;
         }
         
 //        if (button->_fadingState != kLoopNotFading && button->_fadingState != kLoopFullVolume) {
@@ -147,6 +142,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     _dragging = YES;
     _fadingState = kLoopFullVolume;
     [self setGainWithTouches:touches];
+    [_progressCircle updatePercentProgress:_percentagePlayed];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event

@@ -11,7 +11,8 @@
 
 #import <AudioToolbox/AudioToolbox.h>
 
-static void CheckError(OSStatus error, const char *operation) {
+static void CheckError(OSStatus error, const char *operation)
+{
 	if (error == noErr) return;
 	
 	char str[20];
@@ -25,6 +26,34 @@ static void CheckError(OSStatus error, const char *operation) {
 		sprintf(str, "%d", (int)error);
     
 	fprintf(stderr, "Error: %s (%s)\n", operation, str);
+}
+
+static UInt32 audioFileDuration(AudioFileID afid, AudioStreamBasicDescription asbd)
+{
+    UInt64 dataPacketCount;
+    UInt64 totalFrames;
+    UInt32 propertySize;
+    OSStatus err;
+    
+    totalFrames = 0;
+    propertySize = sizeof(dataPacketCount);
+    
+    err = AudioFileGetProperty(afid, kAudioFilePropertyAudioDataPacketCount, &propertySize, &dataPacketCount);
+    if (err) {
+        fprintf(stderr, "AudioFileGetProperty kAudioFilePropertyAudioDataPacketCount failed\n");
+    } else {
+        if (asbd.mFramesPerPacket)
+            totalFrames = asbd.mFramesPerPacket * dataPacketCount;
+    }
+    
+    AudioFilePacketTableInfo pti;
+    propertySize = sizeof(pti);
+    err = AudioFileGetProperty(afid, kAudioFilePropertyPacketTableInfo, &propertySize, &pti);
+    if (err == noErr) {
+        totalFrames = pti.mNumberValidFrames;
+    }
+    
+    return (UInt32)totalFrames;
 }
 
 #endif

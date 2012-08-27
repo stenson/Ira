@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 static NSString * const kRecordedFileName = @"%@/recorded-program-output.m4a";
-static Float32 const kMicrophoneGain = 20;
+static Float32 const kMicrophoneGain = -20;
 
 @interface VLFAudioGraph () {
     AUGraph graph;
@@ -51,14 +51,19 @@ static Float32 const kMicrophoneGain = 20;
     UInt32 asbdSize = sizeof(fileASBD);
     CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyDataFormat, &asbdSize, &fileASBD), "file format");
     
+    printf("bytes %lu\n", fileASBD.mBytesPerFrame);
     UInt32 framesToPlay = numPackets * fileASBD.mFramesPerPacket;
-    fileASBD.mBytesPerFrame
     
     UInt32 duration;
     UInt32 dSize = sizeof(duration);
     CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyEstimatedDuration, &dSize, &duration), "duration");
     
+    printf("\n\n\n\n\n\n");
     printf("DURATION %lu\n", duration);
+    printf("OTHER DURATION\n");
+    UInt32 playableFrames;
+    playableFrames = audioFileDuration(recordedFile, fileASBD);
+    printf("\n\n\n\n\n\n");
     
     ScheduledAudioFileRegion rgn;
     memset(&rgn.mTimeStamp, 0, sizeof(rgn.mTimeStamp));
@@ -81,7 +86,7 @@ static Float32 const kMicrophoneGain = 20;
     CheckError(AudioUnitSetProperty(unit, kAudioUnitProperty_ScheduleStartTimeStamp, kAudioUnitScope_Global, 0, &startTime, sizeof(startTime)),
                "start time");
     
-    return framesToPlay;
+    return playableFrames;
 }
 
 static void InterruptionListener (void *inUserData, UInt32 inInterruptionState) {
