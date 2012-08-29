@@ -29,7 +29,7 @@
 		98A3CBD115CB86C000C13711 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98A3CBD015CB86C000C13711 /* AVFoundation.framework */; };
 		98ED2A4C15DEEC950035A53B /* fiddle2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A4B15DEEC840035A53B /* fiddle2.m4a */; };
 		98ED2A5615DF00C80035A53B /* canvassimple.png in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A5515DF00C80035A53B /* canvassimple.png */; };
-		98F24E4215EAE20200BB68CD /* VLFLoopProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98F24E4115EAE20200BB68CD /* VLFLoopProgressView.m */; };
+		98F24E4515EDF20400BB68CD /* image.png in Resources */ = {isa = PBXBuildFile; fileRef = 98F24E4415EDF20400BB68CD /* image.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,8 +64,7 @@
 		98A3CBD015CB86C000C13711 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		98ED2A4B15DEEC840035A53B /* fiddle2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = fiddle2.m4a; path = ../../fiddle2.m4a; sourceTree = "<group>"; };
 		98ED2A5515DF00C80035A53B /* canvassimple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = canvassimple.png; path = ../../canvassimple.png; sourceTree = "<group>"; };
-		98F24E4015EAE20200BB68CD /* VLFLoopProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFLoopProgressView.h; sourceTree = "<group>"; };
-		98F24E4115EAE20200BB68CD /* VLFLoopProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFLoopProgressView.m; sourceTree = "<group>"; };
+		98F24E4415EDF20400BB68CD /* image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = image.png; path = ../../image.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,8 +130,6 @@
 				9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */,
 				989A493415DD1F130093ECAC /* VLFLoopButton.h */,
 				989A493515DD1F130093ECAC /* VLFLoopButton.m */,
-				98F24E4015EAE20200BB68CD /* VLFLoopProgressView.h */,
-				98F24E4115EAE20200BB68CD /* VLFLoopProgressView.m */,
 			);
 			path = Ira;
 			sourceTree = "<group>";
@@ -140,6 +137,7 @@
 		02C2D88515A4A92000C46968 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				98F24E4415EDF20400BB68CD /* image.png */,
 				9866BE3C15E4AB6000616193 /* ukulele.m4a */,
 				9866BE3A15E495F700616193 /* canvassimple@2x.png */,
 				98ED2A5515DF00C80035A53B /* canvassimple.png */,
@@ -217,6 +215,7 @@
 				02C2D8A515A5001500C46968 /* ira.png in Resources */,
 				98ED2A5615DF00C80035A53B /* canvassimple.png in Resources */,
 				9866BE3B15E495F700616193 /* canvassimple@2x.png in Resources */,
+				98F24E4515EDF20400BB68CD /* image.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,7 +232,6 @@
 				02C2D8A115A4B31900C46968 /* VLFAudioGraph.m in Sources */,
 				989A493615DD1F130093ECAC /* VLFLoopButton.m in Sources */,
 				9821892615DECF2300DEA89A /* VLFTableViewController.m in Sources */,
-				98F24E4215EAE20200BB68CD /* VLFLoopProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

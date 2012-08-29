@@ -51,19 +51,10 @@ static Float32 const kMicrophoneGain = -20;
     UInt32 asbdSize = sizeof(fileASBD);
     CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyDataFormat, &asbdSize, &fileASBD), "file format");
     
-    printf("bytes %lu\n", fileASBD.mBytesPerFrame);
     UInt32 framesToPlay = numPackets * fileASBD.mFramesPerPacket;
     
-    UInt32 duration;
-    UInt32 dSize = sizeof(duration);
-    CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyEstimatedDuration, &dSize, &duration), "duration");
-    
-    printf("\n\n\n\n\n\n");
-    printf("DURATION %lu\n", duration);
-    printf("OTHER DURATION\n");
     UInt32 playableFrames;
     playableFrames = audioFileDuration(recordedFile, fileASBD);
-    printf("\n\n\n\n\n\n");
     
     ScheduledAudioFileRegion rgn;
     memset(&rgn.mTimeStamp, 0, sizeof(rgn.mTimeStamp));
@@ -277,16 +268,13 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     
     // set kAudioUnitProperty_StreamFormat on input & output of eqUnit with updated sample rate (is it always 44100?)
 
-    CheckError(AudioUnitSetProperty(mixerUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize),
-               "set asbd on mixer output");
+    CheckError(AudioUnitSetProperty(mixerUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize), "set asbd on mixer output");
     
-    CheckError(AudioUnitSetProperty(converterUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize),
-               "asbd on converter");
+    CheckError(AudioUnitSetProperty(converterUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize), "asbd on converter");
     
     AudioUnit notifierUnit = _finalMixUnit;
     CheckError(AudioUnitAddRenderNotify(notifierUnit, &RecordingCallback, (__bridge void*)self), "render notify");
-    CheckError(AudioUnitGetProperty(notifierUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &_notifierASBD, &asbdSize),
-               "notifier ABSD");
+    CheckError(AudioUnitGetProperty(notifierUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &_notifierASBD, &asbdSize), "notifier ABSD");
     
     // microphone chain
     CheckError(AUGraphConnectNodeInput(graph, rio, 1,       mixer, 0),      "plug");

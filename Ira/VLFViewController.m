@@ -8,7 +8,6 @@
 
 #import "VLFViewController.h"
 #import <QuartzCore/QuartzCore.h>
-#import "VLFLoopProgressView.h"
 
 @interface VLFViewController () {
     VLFAudioGraph *audioGraph;
@@ -63,15 +62,9 @@
     for (NSString *title in titles) {
         CGRect rect = CGRectMake(xPosition, yPosition, dimension, dimension);
         
-        //VLFLoopProgressView *progress = [[VLFLoopProgressView alloc] initWithFrame:CGRectInset(rect, 15.0, 15.0)];
         VLFLoopButton *button = [[VLFLoopButton alloc] initWithFrame:rect audioUnitIndex:[audioGraph fetchFilePlayer] audioGraph:audioGraph andLoopTitle:title];
         
-        //button.progressCircle = progress;
-        
-        //[self.view addSubview:progress];
         [self.view addSubview:button];
-        
-        //[progress updatePercentProgress:0.1];
         
         if (i % 2 == 0) {
             yPosition += outerDimension;

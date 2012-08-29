@@ -13,12 +13,14 @@ static UInt32 const kLoopFadingIn = 1;
 static UInt32 const kLoopFadingOut = 2;
 static UInt32 const kLoopFullVolume = 3;
 
+static Float32 const kProgressAnimationMS = 0.016;
+
 static Float32 const kDragGainLowerBound = 0.1;
 static double const kTapTolerance = 0.1;
 
 @interface VLFLoopButton () {
     VLFAudioGraph *_graph;
-    CALayer *_gainLayer;
+    CGImageRef _image;
     
     int _unitIndex;
     AudioUnit _unit;
@@ -29,7 +31,8 @@ static double const kTapTolerance = 0.1;
     Float32 _gain;
     Float32 _fadingState;
     UInt32 _framesToPlay;
-    UInt32 _framesPlayed;
+    
+    NSTimer *_timer;
     
     BOOL _dragging;
 }
@@ -38,8 +41,6 @@ static double const kTapTolerance = 0.1;
 @end
 
 @implementation VLFLoopButton
-
-@synthesize progressCircle = _progressCircle;
 
 #pragma mark callbacks
 
@@ -54,7 +55,6 @@ static OSStatus UnitRenderCallback (void *inRefCon,
         VLFLoopButton *button = (__bridge VLFLoopButton *)inRefCon;
         
         if (!(*ioActionFlags & kAudioUnitRenderAction_OutputIsSilence)) {
-            
             AudioTimeStamp playTime;
             UInt32 pSize = sizeof(playTime);
             CheckError(AudioUnitGetProperty(button->_unit, kAudioUnitProperty_CurrentPlayTime, kAudioUnitScope_Global, 0, &playTime, &pSize), "current play time");
@@ -62,26 +62,6 @@ static OSStatus UnitRenderCallback (void *inRefCon,
             UInt32 playedFrames = playTime.mSampleTime;
             button->_percentagePlayed = (Float32)(playedFrames % button->_framesToPlay) / button->_framesToPlay;
         }
-        
-//        if (button->_fadingState != kLoopNotFading && button->_fadingState != kLoopFullVolume) {
-//            if (button->_fadingState == kLoopFadingIn) {
-//                if (button->_gain < 1.0) {
-//                    button->_gain = button->_gain + 0.009;
-//                } else {
-//                    button->_fadingState = kLoopFullVolume;
-//                    button->_gain = 1.0;
-//                }
-//            } else if (button->_fadingState == kLoopFadingOut) {
-//                if (button->_gain > 0.0) {
-//                    button->_gain = button->_gain - 0.005;
-//                } else {
-//                    button->_fadingState = kLoopNotFading;
-//                    button->_gain = 0.0;
-//                }
-//            }
-//            
-//            [button setGainWithValue:button->_gain];
-//        }
     }
     
     return noErr;
@@ -93,27 +73,15 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor colorWithRed:0.54 green:0.74 blue:0.64 alpha:0.2];
-        
-        self.layer.shadowOffset = CGSizeMake(0, 0);
-        self.layer.shadowColor = [[UIColor darkGrayColor] CGColor];
-        self.layer.shadowRadius = 1.0;
-        self.layer.shadowOpacity = 0.4;
-        
-        self.layer.cornerRadius = 1.0;
-        
-        self.layer.borderWidth = 1.0f;
-        self.layer.borderColor = [[UIColor colorWithWhite:0.4 alpha:0.6] CGColor];
-        
-        [self addGainLayerGivenFrame:frame];
         
         _unitIndex = index;
         _graph = graph;
         _playing = NO;
         _gain = 0.0;
         _unit = [_graph getFilePlayerForIndex:_unitIndex];
+        _percentagePlayed = 0.0;
         
-        _framesPlayed = 0;
+        _image = [[UIImage imageNamed:@"image"] CGImage];
         
         NSString *filePath = [[NSBundle mainBundle] pathForResource:loopTitle ofType:@"m4a"];
         _loopURLRef = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)filePath, kCFURLPOSIXPathStyle, false);
@@ -121,6 +89,13 @@ static OSStatus UnitRenderCallback (void *inRefCon,
         [self addCallbacks];
     }
     return self;
+}
+
+- (void)updateGraphics:(NSTimer *)timer
+{
+    if (_playing) {
+        [self setNeedsDisplay];
+    }
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -142,7 +117,8 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     _dragging = YES;
     _fadingState = kLoopFullVolume;
     [self setGainWithTouches:touches];
-    [_progressCircle updatePercentProgress:_percentagePlayed];
+    [self setNeedsDisplay];
+    //[_progressCircle updatePercentProgress:_percentagePlayed];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -160,6 +136,68 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 //    }
 }
 
+- (void)drawRect:(CGRect)rect
+{
+    CGRect allRect = self.bounds;
+    CGRect circleRect = CGRectInset(allRect, 0.0f, 0.0f);
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    // Draw background
+    CGContextSetRGBFillColor(context, 0.9f, 0.9f, 0.9f, 1.0f);
+    CGContextFillEllipseInRect(context, circleRect);
+    
+    CGContextSaveGState(context);
+    
+    // animated progress circle
+    CGPoint center = CGPointMake(allRect.size.width / 2, allRect.size.height / 2);
+    CGFloat radius = (allRect.size.width - 4) / 2;
+    CGFloat startAngle = - ((float)M_PI / 2); // 90 degrees
+    CGFloat endAngle = (_percentagePlayed * 2 * (float)M_PI) + startAngle;
+    CGFloat trailingAngle = endAngle - startAngle/15;
+    //CGContextSetRGBFillColor(context, 0.8, 0.8, 0.8, 0.8f);
+    CGContextMoveToPoint(context, center.x, center.y);
+    CGContextAddArc(context, center.x, center.y, radius, trailingAngle, endAngle, 0);
+    CGContextClosePath(context);
+    //CGContextFillPath(context);
+    
+    CGContextClip(context);
+    
+    CGFloat gainHeight = (1 - _gain) * self.bounds.size.height;
+    CGRect ungainHalf = CGRectMake(0, 0, self.bounds.size.width, gainHeight);
+    CGRect gainHandle = CGRectMake(0, gainHeight, self.bounds.size.width, 10);
+    CGRect gainHalf = CGRectMake(0, gainHeight + 10, self.bounds.size.width, self.bounds.size.height);
+    CGContextSetRGBFillColor(context, 0.0, 0.0, 0.0, 0.4);
+    CGContextFillRect(context, ungainHalf);
+    CGContextSetRGBFillColor(context, 0.0, 0.0, 0.0, 1.0);
+    CGContextFillRect(context, gainHandle);
+    CGContextSetRGBFillColor(context, 0.0, 0.0, 0.0, 0.7);
+    CGContextFillRect(context, gainHalf);
+    
+    CGContextRestoreGState(context);
+    
+    // knock out the center
+    CGRect insetCircleRect = CGRectInset(allRect, 23.0f, 23.0f);
+    CGContextSetRGBStrokeColor(context, 0.95f, 0.95f, 0.95f, 1.0f);
+    CGContextSetRGBFillColor(context, 1.0, 1.0, 1.0, 1.0);
+    CGContextSetLineWidth(context, 2.0f);
+    CGContextFillEllipseInRect(context, insetCircleRect);
+    CGContextStrokeEllipseInRect(context, insetCircleRect);
+    
+    CGRect centralRect = CGRectInset(insetCircleRect, 2.0f, 2.0f);
+    CGFloat insetRadius = centralRect.size.width/2;
+    CGContextAddArc(context, centralRect.origin.x + insetRadius, centralRect.origin.y + insetRadius, insetRadius, 0.0, 2*M_PI, 0);
+    //CGContextSetRGBFillColor(context, 0.5, 0.5, 0.9, 1.0);
+    //CGContextFillPath(context);
+    
+    CGContextClip(context);
+    CGContextRotateCTM(context, arc4random());
+    CGContextDrawImage(context, centralRect, _image);
+    //CGContextClearRect(context, centralRect);
+//    CGContextSetRGBFillColor(context, 0.4, 0.5, 0.9, 1.0);
+//    CGContextFillRect(context, gainHandle);
+}
+
 #pragma mark private
 
 - (UIColor *)borderColor
@@ -171,13 +209,17 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 {
     _playing = YES;
     _framesToPlay = [_graph playbackURL:_loopURLRef withLoopCount:100 andUnitIndex:_unitIndex];
+    _timer = [NSTimer scheduledTimerWithTimeInterval:kProgressAnimationMS target:self selector:@selector(updateGraphics:) userInfo:nil repeats:YES];
 }
 
 - (void)stopLoop
 {
     _playing = NO;
-    _framesPlayed = 0;
+    _percentagePlayed = 0.0;
+    _gain = 0.0;
     AudioUnitReset(_unit, kAudioUnitScope_Global, 0);
+    [_timer invalidate];
+    [self setNeedsDisplay];
 }
 
 - (void)setGainWithTouches:(NSSet *)touches
@@ -189,56 +231,10 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     [self setGainWithValue:(y/height)];
 }
 
-- (void)addGainLayerGivenFrame:(CGRect)frame
-{
-    CGFloat red = 0.57;
-    CGFloat green = 0.67;
-    CGFloat blue = 0.79;
-    
-    _gainLayer = [CALayer layer];
-    _gainLayer.frame = CGRectMake(0, frame.size.height - 4, frame.size.width, frame.size.height);
-    _gainLayer.backgroundColor = [[UIColor colorWithRed:red green:green blue:blue alpha:0.2] CGColor];
-    
-//    _gainLayer.shadowOffset = CGSizeMake(0, 1);
-//    _gainLayer.shadowColor = [[UIColor darkGrayColor] CGColor];
-//    _gainLayer.shadowRadius = 1.0;
-//    _gainLayer.shadowOpacity = 0.2;
-    
-    CALayer *handle = [CALayer layer];
-    handle.frame = CGRectMake(0, 0, _gainLayer.frame.size.width, 1);
-    handle.borderWidth = 1.0;
-    handle.borderColor = [[UIColor colorWithWhite:0.5 alpha:0.9] CGColor];
-    //handle.backgroundColor = [[UIColor whiteColor] CGColor];
-    handle.backgroundColor = [[UIColor colorWithPatternImage:[UIImage imageNamed:@"canvassimple"]] CGColor];
-    
-    [_gainLayer addSublayer:handle];
-    [self.layer addSublayer:_gainLayer];
-    
-    self.layer.masksToBounds = YES;
-}
-
 - (void)setGainWithValue:(Float32)gain
 {
     _gain = gain;
     [_graph setGain:_gain forMixerInput:_unitIndex];
-    
-    [self repositionGainLayerWithGain:_gain];
-}
-
-- (void)repositionGainLayerWithGain:(Float32)gain
-{
-    CGFloat yPosition = (_gainLayer.frame.size.height - 4) * (1.0 - gain);
-    
-    if (_dragging) {
-        [CATransaction begin];
-        [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
-    }
-    
-    _gainLayer.frame = CGRectMake(0, MAX(yPosition, 3), _gainLayer.frame.size.width, _gainLayer.frame.size.height);
-    
-    if (_dragging) {
-        [CATransaction commit];
-    }
 }
 
 - (void)simpleButtonPressedWithFade:(BOOL)shouldFade

@@ -11,11 +11,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import "VLFAudioGraph.h"
 #import "VLFAudioUtilities.h"
-#import "VLFLoopProgressView.h"
 
 @interface VLFLoopButton : UIButton
-
-@property (nonatomic) VLFLoopProgressView *progressCircle;
 
 - (id)initWithFrame:(CGRect)frame audioUnitIndex:(int)index audioGraph:(VLFAudioGraph *)graph andLoopTitle:(NSString *)loopTitle;
 
