@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 static NSString * const kRecordedFileName = @"%@/recorded-program-output.m4a";
-static Float32 const kMicrophoneGain = -20;
+static Float32 const kMicrophoneGain = 20;
 
 @interface VLFAudioGraph () {
     AUGraph graph;
@@ -33,6 +33,9 @@ static Float32 const kMicrophoneGain = -20;
 @end
 
 @implementation VLFAudioGraph
+
+@synthesize mixerUnit = _mixerUnit;
+@synthesize rioUnit = _rioUnit;
 
 + (UInt32)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnit:(AudioUnit)unit
 {
@@ -60,7 +63,8 @@ static Float32 const kMicrophoneGain = -20;
     memset(&rgn.mTimeStamp, 0, sizeof(rgn.mTimeStamp));
     rgn.mTimeStamp.mFlags = kAudioTimeStampSampleTimeValid;
     rgn.mTimeStamp.mSampleTime = 0;
-    rgn.mCompletionProc = FileCompleteCallback; 
+    //rgn.mCompletionProc = FileCompleteCallback; 
+    rgn.mCompletionProc = NULL;
     rgn.mCompletionProcUserData = NULL;
     rgn.mAudioFile = recordedFile;
     rgn.mLoopCount = loopCount;
@@ -93,6 +97,10 @@ static OSStatus RecordingCallback (void *inRefCon,
 {
     if (*ioActionFlags & kAudioUnitRenderAction_PostRender) {
         VLFAudioGraph *ag = (__bridge VLFAudioGraph *)inRefCon;
+        
+//        AudioSampleType *buffer = (AudioSampleType *)ioData->mBuffers[0].mData;
+//        printf("%d\n", MAX(abs(buffer[0])-10000, 0));
+        
         if (ag->recording) {
             CheckError(ExtAudioFileWriteAsync(ag->outputFile, inNumberFrames, ioData), "write to file");
         }
@@ -101,10 +109,30 @@ static OSStatus RecordingCallback (void *inRefCon,
     return noErr;
 }
 
-static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *bufferList, OSStatus status)
+static OSStatus MicrophoneCallback (void *inRefCon,
+                                    AudioUnitRenderActionFlags *ioActionFlags,
+                                    const AudioTimeStamp *inTimeStamp,
+                                    UInt32 inBusNumber,
+                                    UInt32 inNumberFrames,
+                                    AudioBufferList *ioData)
 {
-    NSLog(@"File COMPLETE");
+    if (*ioActionFlags & kAudioUnitRenderAction_PostRender) {
+        
+        AudioSampleType *buffer = (AudioSampleType *)ioData->mBuffers[0].mData;
+        
+        int shifted = (int)fabsf((float)(buffer[0] << 9));
+        printf("%d\n", MAX(shifted, 0));
+        
+        //vDSP_vflt16(ioData->mBuffers[0].mData, 1, button->_scratchBuffer, 1, inNumberFrames);
+    }
+    
+    return noErr;
 }
+
+//static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *bufferList, OSStatus status)
+//{
+//    NSLog(@"File COMPLETE");
+//}
 
 - (void)notifyNoInputAvailable
 {
@@ -211,18 +239,19 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     CheckError(AUGraphOpen(graph), "open graph");
     
     AudioUnit dpUnit;
-    AudioUnit rioUnit;
-    AudioUnit mixerUnit;
     AudioUnit lowpassUnit;
     AudioUnit converterUnit;
     
     CheckError(AUGraphNodeInfo(graph, dp, NULL, &dpUnit), "dpUnit");
-    CheckError(AUGraphNodeInfo(graph, rio, NULL, &rioUnit), "rioUnit");
-    CheckError(AUGraphNodeInfo(graph, mixer, NULL, &mixerUnit), "mixerUnit");
+    CheckError(AUGraphNodeInfo(graph, rio, NULL, &_rioUnit), "rioUnit");
+    CheckError(AUGraphNodeInfo(graph, mixer, NULL, &_mixerUnit), "mixerUnit");
     CheckError(AUGraphNodeInfo(graph, lowpass, NULL, &lowpassUnit), "lowpassUnit");
     CheckError(AUGraphNodeInfo(graph, _finalMix, NULL, &_finalMixUnit), "finalMixUnit");
     CheckError(AUGraphNodeInfo(graph, converter, NULL, &converterUnit), "converterUnit");
     CheckError(AUGraphNodeInfo(graph, filePlayer, NULL, &filePlayerUnit), "filePlayerUnit");
+    
+//    UInt32 on = 1;
+//    CheckError(AudioUnitSetProperty(_mixerUnit, kAudioUnitProperty_MeteringMode, kAudioUnitScope_Output, 0, &on, sizeof(UInt32)), "set metering on");
     
     eqUnit = [self configureEQNode:eq  WithHz:209  Db:-6.0  AndQ:0.30];
     [self configureEQNode:eq2 WithHz:541  Db:-12.0 AndQ:0.30];
@@ -242,11 +271,11 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
 
     UInt32 oneFlag = 1;
 	AudioUnitElement bus0 = 0;
-	CheckError(AudioUnitSetProperty(rioUnit, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, bus0, &oneFlag, sizeof(oneFlag)),
+	CheckError(AudioUnitSetProperty(_rioUnit, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, bus0, &oneFlag, sizeof(oneFlag)),
 			   "Couldn't enable RIO output");
 	
 	AudioUnitElement bus1 = 1;
-	CheckError(AudioUnitSetProperty(rioUnit, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, bus1, &oneFlag, sizeof(oneFlag)),
+	CheckError(AudioUnitSetProperty(_rioUnit, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, bus1, &oneFlag, sizeof(oneFlag)),
 			   "Couldn't enable RIO input");
     
     AudioStreamBasicDescription effectASBD;
@@ -268,13 +297,15 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     
     // set kAudioUnitProperty_StreamFormat on input & output of eqUnit with updated sample rate (is it always 44100?)
 
-    CheckError(AudioUnitSetProperty(mixerUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize), "set asbd on mixer output");
+    CheckError(AudioUnitSetProperty(_mixerUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize), "set asbd on mixer output");
     
     CheckError(AudioUnitSetProperty(converterUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize), "asbd on converter");
     
     AudioUnit notifierUnit = _finalMixUnit;
     CheckError(AudioUnitAddRenderNotify(notifierUnit, &RecordingCallback, (__bridge void*)self), "render notify");
     CheckError(AudioUnitGetProperty(notifierUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &_notifierASBD, &asbdSize), "notifier ABSD");
+    
+    CheckError(AudioUnitAddRenderNotify(_mixerUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
     
     // microphone chain
     CheckError(AUGraphConnectNodeInput(graph, rio, 1,       mixer, 0),      "plug");

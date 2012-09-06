@@ -14,6 +14,9 @@
 
 + (UInt32)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnit:(AudioUnit)unit;
 
+@property (nonatomic) AudioUnit mixerUnit;
+@property (nonatomic) AudioUnit rioUnit;
+
 - (BOOL)setupAudioSession;
 - (BOOL)enableGraph;
 - (BOOL)disableGraph;

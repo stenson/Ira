@@ -12,7 +12,7 @@
 @interface VLFViewController () {
     VLFAudioGraph *audioGraph;
     UIButton *standby;
-    UIButton *record;
+    VLFRecordButton *record;
     
     UITableView *_recordings;
     VLFTableViewController *_recordingsController;
@@ -51,7 +51,7 @@
 
 - (void)addLoopButtons
 {
-    NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"neworleans", @"ukulele", @"fiddle2", nil];
+    NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"newmark", @"ukulele", @"fiddle2", nil];
     int dimension = 80;
     int outerDimension = 90;
     int initialXPosition = 45;
@@ -79,47 +79,14 @@
 
 - (void)addRecordButton
 {
-    record = [UIButton buttonWithType:UIButtonTypeCustom];
-    [record setTitle:@"" forState:UIControlStateNormal];
-    [record setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
-    
-    record.backgroundColor = [UIColor colorWithRed:0.96f green:0.28f blue:0.34f alpha:0.3f];
-    
-    record.layer.cornerRadius = 170/2;
-    
-    record.layer.borderWidth = 1.0f;
-    record.layer.borderColor = [[UIColor colorWithWhite:0.4 alpha:0.8] CGColor];
-    
-    record.layer.shadowOffset = CGSizeMake(0, 0);
-    record.layer.shadowRadius = 0.0;
-    record.layer.shadowColor = [[UIColor darkGrayColor] CGColor];
-    record.layer.shadowOpacity = 0.5;
-    
-    record.layer.masksToBounds = YES;
-    
-    record.frame = CGRectMake(45, 30, 170, 170);
+    record = [[VLFRecordButton alloc] initWithFrame:CGRectMake(45, 30, 170, 170) andAudioUnit:audioGraph.rioUnit];
     [[self view] addSubview:record];
-
     [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
-}
-
-- (void)animateButton:(UIButton *)button toColor:(UIColor *)color
-{
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.15];
-    button.backgroundColor = color;
-    [UIView commitAnimations];
 }
 
 - (void)recordPressed
 {
-    BOOL state = [audioGraph toggleRecording];
-    
-    if (state) {
-        [self animateButton:record toColor:[UIColor colorWithRed:0.96f green:0.18f blue:0.34f alpha:1.0f]];
-    } else {
-        [self animateButton:record toColor:[UIColor colorWithRed:0.86f green:0.08f blue:0.24f alpha:0.1f]];
-    }
+    [audioGraph toggleRecording];
 }
 
 - (void)addTableView

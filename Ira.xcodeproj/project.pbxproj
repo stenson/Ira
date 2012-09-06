@@ -20,9 +20,14 @@
 		02C2D8A515A5001500C46968 /* ira.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C2D8A415A5001500C46968 /* ira.png */; };
 		982188C015DDA5B800DEA89A /* banjo.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 982188BE15DDA5A300DEA89A /* banjo.m4a */; };
 		9821892615DECF2300DEA89A /* VLFTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9821892515DECF2300DEA89A /* VLFTableViewController.m */; };
+		98366E4015F08942009841A8 /* VLFRecordButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 98366E3F15F08942009841A8 /* VLFRecordButton.m */; };
+		9853A2A015F885A800863CD1 /* facesmall.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A29F15F885A800863CD1 /* facesmall.png */; };
+		9853A2A215F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A115F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png */; };
+		9853A2A415F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A315F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png */; };
 		9866BE3615E20AAC00616193 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9866BE3515E20AAC00616193 /* QuartzCore.framework */; };
 		9866BE3B15E495F700616193 /* canvassimple@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3A15E495F700616193 /* canvassimple@2x.png */; };
 		9866BE3D15E4AB7A00616193 /* ukulele.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3C15E4AB6000616193 /* ukulele.m4a */; };
+		986F462315F5334900BD8508 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 986F462215F5334900BD8508 /* Accelerate.framework */; };
 		9899994915D0E2AF001CEB68 /* neworleans.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9899994815D0D7AC001CEB68 /* neworleans.m4a */; };
 		989A492415DAF86B0093ECAC /* doowop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 989A492315DAF8600093ECAC /* doowop.m4a */; };
 		989A493615DD1F130093ECAC /* VLFLoopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 989A493515DD1F130093ECAC /* VLFLoopButton.m */; };
@@ -30,6 +35,7 @@
 		98ED2A4C15DEEC950035A53B /* fiddle2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A4B15DEEC840035A53B /* fiddle2.m4a */; };
 		98ED2A5615DF00C80035A53B /* canvassimple.png in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A5515DF00C80035A53B /* canvassimple.png */; };
 		98F24E4515EDF20400BB68CD /* image.png in Resources */ = {isa = PBXBuildFile; fileRef = 98F24E4415EDF20400BB68CD /* image.png */; };
+		98F24E4715F048CD00BB68CD /* newmark.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 98F24E4615F048A500BB68CD /* newmark.m4a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,9 +59,15 @@
 		982188BE15DDA5A300DEA89A /* banjo.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = banjo.m4a; path = ../../banjo.m4a; sourceTree = "<group>"; };
 		9821892415DECF2300DEA89A /* VLFTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFTableViewController.h; sourceTree = "<group>"; };
 		9821892515DECF2300DEA89A /* VLFTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFTableViewController.m; sourceTree = "<group>"; };
+		98366E3E15F08942009841A8 /* VLFRecordButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFRecordButton.h; sourceTree = "<group>"; };
+		98366E3F15F08942009841A8 /* VLFRecordButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFRecordButton.m; sourceTree = "<group>"; };
+		9853A29F15F885A800863CD1 /* facesmall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = facesmall.png; sourceTree = "<group>"; };
+		9853A2A115F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Screen Shot 2012-09-06 at 12.19.09 AM.png"; sourceTree = "<group>"; };
+		9853A2A315F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Screen Shot 2012-09-06 at 12.21.40 AM.png"; sourceTree = "<group>"; };
 		9866BE3515E20AAC00616193 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9866BE3A15E495F700616193 /* canvassimple@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "canvassimple@2x.png"; path = "../../canvassimple@2x.png"; sourceTree = "<group>"; };
 		9866BE3C15E4AB6000616193 /* ukulele.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = ukulele.m4a; path = ../../ukulele.m4a; sourceTree = "<group>"; };
+		986F462215F5334900BD8508 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFAudioUtilities.h; sourceTree = "<group>"; };
 		9899994815D0D7AC001CEB68 /* neworleans.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = neworleans.m4a; sourceTree = "<group>"; };
 		989A492315DAF8600093ECAC /* doowop.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = doowop.m4a; path = "../../../Library/Application Support/iPhone Simulator/5.1/Applications/078F6802-F339-429D-92C8-7DE4FB47B4C4/Documents/doowop.m4a"; sourceTree = "<group>"; };
@@ -65,6 +77,7 @@
 		98ED2A4B15DEEC840035A53B /* fiddle2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = fiddle2.m4a; path = ../../fiddle2.m4a; sourceTree = "<group>"; };
 		98ED2A5515DF00C80035A53B /* canvassimple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = canvassimple.png; path = ../../canvassimple.png; sourceTree = "<group>"; };
 		98F24E4415EDF20400BB68CD /* image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = image.png; path = ../../image.png; sourceTree = "<group>"; };
+		98F24E4615F048A500BB68CD /* newmark.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = newmark.m4a; path = "../../../Music/iTunes/iTunes Media/Music/Unknown Artist/Unknown Album/newmark.m4a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				986F462315F5334900BD8508 /* Accelerate.framework in Frameworks */,
 				9866BE3615E20AAC00616193 /* QuartzCore.framework in Frameworks */,
 				98A3CBD115CB86C000C13711 /* AVFoundation.framework in Frameworks */,
 				02C2D8A315A4B46E00C46968 /* AudioToolbox.framework in Frameworks */,
@@ -87,6 +101,10 @@
 		02C2D86F15A4A92000C46968 = {
 			isa = PBXGroup;
 			children = (
+				9853A2A315F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png */,
+				9853A2A115F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png */,
+				9853A29F15F885A800863CD1 /* facesmall.png */,
+				986F462215F5334900BD8508 /* Accelerate.framework */,
 				9866BE3515E20AAC00616193 /* QuartzCore.framework */,
 				98A3CBD015CB86C000C13711 /* AVFoundation.framework */,
 				02C2D8A215A4B46E00C46968 /* AudioToolbox.framework */,
@@ -130,6 +148,8 @@
 				9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */,
 				989A493415DD1F130093ECAC /* VLFLoopButton.h */,
 				989A493515DD1F130093ECAC /* VLFLoopButton.m */,
+				98366E3E15F08942009841A8 /* VLFRecordButton.h */,
+				98366E3F15F08942009841A8 /* VLFRecordButton.m */,
 			);
 			path = Ira;
 			sourceTree = "<group>";
@@ -137,6 +157,7 @@
 		02C2D88515A4A92000C46968 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				98F24E4615F048A500BB68CD /* newmark.m4a */,
 				98F24E4415EDF20400BB68CD /* image.png */,
 				9866BE3C15E4AB6000616193 /* ukulele.m4a */,
 				9866BE3A15E495F700616193 /* canvassimple@2x.png */,
@@ -205,6 +226,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98F24E4715F048CD00BB68CD /* newmark.m4a in Resources */,
 				9866BE3D15E4AB7A00616193 /* ukulele.m4a in Resources */,
 				98ED2A4C15DEEC950035A53B /* fiddle2.m4a in Resources */,
 				982188C015DDA5B800DEA89A /* banjo.m4a in Resources */,
@@ -216,6 +238,9 @@
 				98ED2A5615DF00C80035A53B /* canvassimple.png in Resources */,
 				9866BE3B15E495F700616193 /* canvassimple@2x.png in Resources */,
 				98F24E4515EDF20400BB68CD /* image.png in Resources */,
+				9853A2A015F885A800863CD1 /* facesmall.png in Resources */,
+				9853A2A215F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png in Resources */,
+				9853A2A415F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,6 +257,7 @@
 				02C2D8A115A4B31900C46968 /* VLFAudioGraph.m in Sources */,
 				989A493615DD1F130093ECAC /* VLFLoopButton.m in Sources */,
 				9821892615DECF2300DEA89A /* VLFTableViewController.m in Sources */,
+				98366E4015F08942009841A8 /* VLFRecordButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
