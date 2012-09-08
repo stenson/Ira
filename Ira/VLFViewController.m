@@ -79,7 +79,8 @@
 
 - (void)addRecordButton
 {
-    record = [[VLFRecordButton alloc] initWithFrame:CGRectMake(45, 30, 170, 170) andAudioUnit:audioGraph.rioUnit];
+    record = [[VLFRecordButton alloc] initWithFrame:CGRectMake(45, 30, 170, 170)];
+    record.graph = audioGraph;
     [[self view] addSubview:record];
     [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
 }

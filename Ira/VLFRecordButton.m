@@ -12,55 +12,18 @@
 @interface VLFRecordButton () {
     AudioUnit _au;
     Float32 _inputGain;
-    float *_scratchBuffer;
 }
 
 @end
 
 @implementation VLFRecordButton
 
-float getMeanVolumeSint16( SInt16 * vector , int length ) {
-    
-    
-    // get average input volume level for meter display
-    // by calculating log of mean volume of the buffer
-    // and displaying it to the screen
-    // (note: there's a vdsp function to do this but it works on float samples
-    
-    int sum;
-    int i;
-    int averageVolume;
-    float logVolume;
-    
-    
-    sum = 0;    
-    for ( i = 0; i < length ; i++ ) {
-        sum += abs((int) vector[i]);
-    }
-    
-    averageVolume = sum / length;
-    
-    //    printf("\naverageVolume before scale = %lu", averageVolume );
-    
-    // now convert to logarithm and scale log10(0->32768) into 0->1 for display
-    
-    
-    logVolume = log10f( (float) averageVolume ); 
-    logVolume = logVolume / log10(32768);
-    
-    return (logVolume);
-    
-}
+@synthesize graph = _graph;
 
-- (id)initWithFrame:(CGRect)frame andAudioUnit:(AudioUnit)unit
+- (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _au = unit;
-        _scratchBuffer = (void *) malloc(2048 * sizeof(float));
-        
-        //CheckError(AudioUnitAddRenderNotify(_au, &MicrophoneCallback, (__bridge void*)self), "microphone notify");
-        
         CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateGraphics:)];
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     }
@@ -69,6 +32,7 @@ float getMeanVolumeSint16( SInt16 * vector , int length ) {
 
 - (void)updateGraphics:(CADisplayLink *)link
 {
+    NSLog(@"average %f", [_graph getMicrophoneAverageDecibels]);
     [self setNeedsDisplay];
 }
 

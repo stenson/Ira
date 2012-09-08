@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import <Accelerate/Accelerate.h>
 #import "VLFAudioUtilities.h"
 
 @interface VLFAudioGraph : NSObject
@@ -26,5 +27,7 @@
 - (void)setGain:(Float32)gain forMixerInput:(int)index;
 - (UInt32)playbackURL:(CFURLRef)url withLoopCount:(UInt32)loopCount andUnitIndex:(int)index;
 - (int)fetchFilePlayer;
+
+- (float)getMicrophoneAverageDecibels;
 
 @end

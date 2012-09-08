@@ -7,12 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AudioToolbox/AudioToolbox.h>
-#import <Accelerate/Accelerate.h>
-#import "VLFAudioUtilities.h"
+#import "VLFAudioGraph.h"
 
 @interface VLFRecordButton : UIButton
 
-- (id)initWithFrame:(CGRect)frame andAudioUnit:(AudioUnit)unit;
+@property (nonatomic) VLFAudioGraph *graph;
+- (id)initWithFrame:(CGRect)frame;
 
 @end

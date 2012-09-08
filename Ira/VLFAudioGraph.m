@@ -29,6 +29,9 @@ static Float32 const kMicrophoneGain = 20;
     int _loopingState;
     BOOL recording;
     BOOL graphEnabled;
+    
+    float _micPeak;
+    float _micAverage;
 }
 @end
 
@@ -117,13 +120,14 @@ static OSStatus MicrophoneCallback (void *inRefCon,
                                     AudioBufferList *ioData)
 {
     if (*ioActionFlags & kAudioUnitRenderAction_PostRender) {
+        VLFAudioGraph *graph = (__bridge VLFAudioGraph *)inRefCon;
+        //AudioSampleType *buffer = (AudioSampleType *)ioData->mBuffers[0].mData;
+        //vDSP_vflt16(ioData->mBuffers[0].mData, 1, graph->_scratchBuffer, 1, inNumberFrames);
+        //vDSP_meamgv(graph->_scratchBuffer, 1, &avg, inNumberFrames);
         
-        AudioSampleType *buffer = (AudioSampleType *)ioData->mBuffers[0].mData;
-        
-        int shifted = (int)fabsf((float)(buffer[0] << 9));
-        printf("%d\n", MAX(shifted, 0));
-        
-        //vDSP_vflt16(ioData->mBuffers[0].mData, 1, button->_scratchBuffer, 1, inNumberFrames);
+        float avg = 0.0;
+        vDSP_meamgv(ioData->mBuffers[0].mData, 1, &avg, inNumberFrames);
+        graph->_micAverage = avg;
     }
     
     return noErr;
@@ -142,6 +146,11 @@ static OSStatus MicrophoneCallback (void *inRefCon,
                                           cancelButtonTitle:@"OK"
                                           otherButtonTitles:nil];
     [alert show];
+}
+
+- (float)getMicrophoneAverageDecibels
+{
+    return _micAverage;
 }
 
 - (Float64)currentHardwareSampleRate
@@ -250,9 +259,6 @@ static OSStatus MicrophoneCallback (void *inRefCon,
     CheckError(AUGraphNodeInfo(graph, converter, NULL, &converterUnit), "converterUnit");
     CheckError(AUGraphNodeInfo(graph, filePlayer, NULL, &filePlayerUnit), "filePlayerUnit");
     
-//    UInt32 on = 1;
-//    CheckError(AudioUnitSetProperty(_mixerUnit, kAudioUnitProperty_MeteringMode, kAudioUnitScope_Output, 0, &on, sizeof(UInt32)), "set metering on");
-    
     eqUnit = [self configureEQNode:eq  WithHz:209  Db:-6.0  AndQ:0.30];
     [self configureEQNode:eq2 WithHz:541  Db:-12.0 AndQ:0.30];
     [self configureEQNode:eq3 WithHz:1495 Db:-12.0 AndQ:0.30];
@@ -301,9 +307,14 @@ static OSStatus MicrophoneCallback (void *inRefCon,
     
     CheckError(AudioUnitSetProperty(converterUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize), "asbd on converter");
     
+    [self printASBD:effectASBD];
+    NSLog(@"\n\n");
+    
     AudioUnit notifierUnit = _finalMixUnit;
     CheckError(AudioUnitAddRenderNotify(notifierUnit, &RecordingCallback, (__bridge void*)self), "render notify");
     CheckError(AudioUnitGetProperty(notifierUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &_notifierASBD, &asbdSize), "notifier ABSD");
+    
+    [self printASBD:_notifierASBD];
     
     CheckError(AudioUnitAddRenderNotify(_mixerUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
     
@@ -484,6 +495,9 @@ static OSStatus MicrophoneCallback (void *inRefCon,
 {
     _filePlayerCount = 0;
     self->recording = NO;
+    
+    _micAverage = 0.0;
+    _micPeak = 0.0;
     
     CheckError(AudioSessionInitialize(NULL, kCFRunLoopDefaultMode, InterruptionListener, (__bridge void *)self),
                "couldn't initialize audio session");
