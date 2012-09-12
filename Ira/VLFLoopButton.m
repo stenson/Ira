@@ -22,6 +22,7 @@ static double const kTapTolerance = 0.1;
     VLFAudioGraph *_graph;
     UIImage *_image;
     NSSet *_lastTouches;
+    NSString *_loopTitle;
     
     int _unitIndex;
     AudioUnit _unit;
@@ -77,7 +78,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
         _dragging = NO;
         _touching = NO;
         
-        self.opaque = YES;
+        self.opaque = NO;
         
         _unitIndex = index;
         _graph = graph;
@@ -87,6 +88,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
         _percentagePlayed = 0.0;
         
         _image = [UIImage imageNamed:@"image"];
+        _loopTitle = loopTitle;
         
         NSString *filePath = [[NSBundle mainBundle] pathForResource:loopTitle ofType:@"m4a"];
         _loopURLRef = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)filePath, kCFURLPOSIXPathStyle, false);
@@ -115,7 +117,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     if (!_playing) {
         [self performSelector:@selector(playLoop) withObject:self afterDelay:0.01];
     } else {
-        [NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(fadeOutWithTimer:) userInfo:nil repeats:YES];
+        [NSTimer scheduledTimerWithTimeInterval:0.025 target:self selector:@selector(fadeOutWithTimer:) userInfo:nil repeats:YES];
     }
 }
 
@@ -142,6 +144,79 @@ static OSStatus UnitRenderCallback (void *inRefCon,
 }
 
 - (void)drawRect:(CGRect)rect
+{
+    CGRect allRect = CGRectMake(0, 0, 100, 100);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    //CGContextSetShadow(context, CGSizeMake(0, 1), 2.0f);
+    
+    CGFloat inset = (1.f - _gain) * 10.f;
+    CGRect circle = CGRectInset(allRect, inset, inset);
+    //CGFloat alpha = ((_gain) / 1.42f) + .7f;
+    CGContextSetRGBFillColor(context, .3f, .3f, .9f, 1.f);
+    CGContextFillEllipseInRect(context, circle);
+    
+    CGContextSetRGBStrokeColor(context, 1.f, 1.f, 1.f, 1.f);
+    CGContextStrokeEllipseInRect(context, CGRectInset(circle, 3.f, 3.f));
+    
+    if (YES || _playing) {
+        CGContextSaveGState(context);
+        
+        CGPoint center = CGPointMake(allRect.size.width/2, allRect.size.height/2);
+        CGFloat radius = (allRect.size.width/2) - inset - 6.f;
+        CGContextMoveToPoint(context, center.x, center.y);
+        CGContextAddArc(context, center.x, center.y, radius, 0, M_PI*2, 0);
+        CGContextClosePath(context);
+        CGContextClip(context);
+        
+        CGContextTranslateCTM(context, allRect.size.width / 2, allRect.size.height / 2);
+        CGContextRotateCTM(context, ((_percentagePlayed + .125)*2) * M_PI);
+        CGContextTranslateCTM(context, -allRect.size.width/2, -allRect.size.height/2);
+        
+        CGContextSetRGBFillColor(context, .3f, .3f, .6f, 1.f);
+        CGContextFillRect(context, CGRectMake(0, allRect.size.height/2, allRect.size.width, allRect.size.height/2));
+        
+        CGContextRestoreGState(context);
+    }
+    
+    CGContextSetRGBFillColor(context, 1.f, 1.f, 1.f, 1.f);
+    CGRect textRect = CGRectInset(allRect, 0.f, 29.f);
+    [[_loopTitle substringToIndex:1] drawInRect:textRect
+                                       withFont:[UIFont boldSystemFontOfSize:18]
+                                  lineBreakMode:UILineBreakModeClip
+                                      alignment:UITextAlignmentCenter];
+}
+
+//- (void)drawRect:(CGRect)rect
+//{
+//    CGRect allRect = self.bounds;
+//    CGContextRef context = UIGraphicsGetCurrentContext();
+//    
+//    CGContextSetRGBFillColor(context, 1.f, 1.f, 1.f, 1.f);
+//    CGContextFillRect(context, allRect);
+//    
+//    CGContextSetLineWidth(context, 1.f);
+//    CGContextSetRGBStrokeColor(context, .4f, .4f, .4f, 1.f);
+//    CGContextStrokeRect(context, allRect);
+//    
+//    CGFloat gainHeight = (1 - _gain) * allRect.size.height;
+//    CGRect gainRect = CGRectMake(0.f, gainHeight, allRect.size.width, 5.f);
+//    CGContextSetRGBFillColor(context, .6f, .6f, .6f, 1.f);
+//    CGContextFillRect(context, gainRect);
+//    
+//    CGPoint center = CGPointMake(allRect.size.width/2, allRect.size.width/2);
+//    CGFloat startAngle = - ((float)M_PI / 2); // 90 degrees
+//    CGFloat endAngle = (_percentagePlayed * 2 * (float)M_PI) + startAngle;
+//    CGContextMoveToPoint(context, center.x, center.y);
+//    CGContextAddArc(context, center.x, center.y, allRect.size.width/2, startAngle, endAngle, 0);
+//    CGContextClosePath(context);
+//    CGContextFillPath(context);
+//    
+//    CGContextSetRGBFillColor(context, 1.f, 1.f, 1.f, 1.f);
+//    CGContextFillEllipseInRect(context, CGRectInset(allRect, 3.f, 3.f));
+//}
+
+- (void)dontDrawRect:(CGRect)rect
 {
     CGRect allRect = self.bounds;
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -173,17 +248,19 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     
     CGContextSetShadow(context, CGSizeMake(0, 1), 2.0);
     
-    // animated progress circle
-    CGPoint center = CGPointMake(allRect.size.width / 2, allRect.size.height / 2);
-    CGFloat radius = (allRect.size.width - 19) / 2;
-    //CGFloat startAngle = - ((float)M_PI / 2); // 90 degrees
-    //CGFloat endAngle = (_percentagePlayed * 2 * (float)M_PI) + startAngle;
-    CGContextMoveToPoint(context, center.x, center.y);
-    CGContextAddArc(context, center.x, center.y, radius, 0, 2*M_PI, 0);
-    CGContextClosePath(context);
-    
     CGContextSetRGBFillColor(context, 0.15, 0.15, 0.15, 0.9);
-    CGContextFillPath(context);
+    CGContextFillEllipseInRect(context, CGRectInset(allRect, 19.f/2, 19.f/2));
+    // animated progress circle
+//    CGPoint center = CGPointMake(allRect.size.width / 2, allRect.size.height / 2);
+//    CGFloat radius = (allRect.size.width - 19) / 2;
+//    //CGFloat startAngle = - ((float)M_PI / 2); // 90 degrees
+//    //CGFloat endAngle = (_percentagePlayed * 2 * (float)M_PI) + startAngle;
+//    CGContextMoveToPoint(context, center.x, center.y);
+//    CGContextAddArc(context, center.x, center.y, radius, 0, 2*M_PI, 0);
+//    CGContextClosePath(context);
+//    
+//    CGContextSetRGBFillColor(context, 0.15, 0.15, 0.15, 0.9);
+//    CGContextFillPath(context);
     
     // knock out the center
     CGRect insetCircleRect = CGRectInset(allRect, 23.0f, 23.0f);
@@ -197,13 +274,13 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     CGFloat insetRadius = centralRect.size.width/2;
     CGContextAddArc(context, centralRect.origin.x + insetRadius, centralRect.origin.y + insetRadius, insetRadius, 0.0, 2*M_PI, 0);
     
-    CGContextSetShadow(context, CGSizeMake(0, 0), 0);
-    
-    CGContextTranslateCTM(context, allRect.size.width / 2, allRect.size.height / 2);
-    CGContextRotateCTM(context, (_percentagePlayed*2) * M_PI);
-    CGContextTranslateCTM(context, -allRect.size.width/2, -allRect.size.height/2);
-    CGContextSetRGBFillColor(context, 0.0, 0.0, 0.0, 1.0);
-    CGContextDrawImage(context, centralRect, [_image CGImage]);
+//    CGContextSetShadow(context, CGSizeMake(0, 0), 0);
+//    
+//    CGContextTranslateCTM(context, allRect.size.width / 2, allRect.size.height / 2);
+//    CGContextRotateCTM(context, (_percentagePlayed*2) * M_PI);
+//    CGContextTranslateCTM(context, -allRect.size.width/2, -allRect.size.height/2);
+//    CGContextSetRGBFillColor(context, 0.0, 0.0, 0.0, 1.0);
+//    CGContextDrawImage(context, centralRect, [_image CGImage]);
 }
 
 #pragma mark private

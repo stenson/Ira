@@ -9,6 +9,9 @@
 #import "VLFViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
+#define RECORD_BUTTON_RECT CGRectMake(30, 40, 200, 200)
+#define LOOP_BUTTONS_RECT CGRectMake(0, 230, 256, 222)
+
 @interface VLFViewController () {
     VLFAudioGraph *audioGraph;
     UIButton *standby;
@@ -52,42 +55,31 @@
 - (void)addLoopButtons
 {
     NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"newmark", @"ukulele", @"fiddle2", nil];
-    int dimension = 80;
-    int outerDimension = 90;
-    int initialXPosition = 45;
-    int xPosition = initialXPosition;
-    int yPosition = 240;
-    int i = 1;
+    CGRect frame = LOOP_BUTTONS_RECT;
+    
+    CGFloat xDim = frame.size.width / 2;
+    CGFloat yDim = frame.size.height / 2;
+    
+    int i = 0;
     
     for (NSString *title in titles) {
-        CGRect rect = CGRectMake(xPosition, yPosition, dimension, dimension);
+        CGFloat x = frame.origin.x + ((i % 2) * xDim);
+        CGFloat y = frame.origin.y + (floorf((i / 2)) * yDim);
+        NSLog(@"%f %f", x, y);
+        CGRect rect = CGRectMake(x, y, xDim, yDim);
         
         VLFLoopButton *button = [[VLFLoopButton alloc] initWithFrame:rect audioUnitIndex:[audioGraph fetchFilePlayer] audioGraph:audioGraph andLoopTitle:title];
         
         [self.view addSubview:button];
-        
-        if (i % 2 == 0) {
-            yPosition += outerDimension;
-            xPosition = initialXPosition;
-        } else {
-            xPosition += outerDimension;
-        }
-        
         i++;
     }
 }
 
 - (void)addRecordButton
 {
-    record = [[VLFRecordButton alloc] initWithFrame:CGRectMake(45, 30, 170, 170)];
+    record = [[VLFRecordButton alloc] initWithFrame:RECORD_BUTTON_RECT];
     record.graph = audioGraph;
     [[self view] addSubview:record];
-    [record addTarget:self action:@selector(recordPressed) forControlEvents:UIControlEventTouchUpInside];
-}
-
-- (void)recordPressed
-{
-    [audioGraph toggleRecording];
 }
 
 - (void)addTableView
@@ -110,7 +102,7 @@
 
 - (void)viewDidLoad
 {
-    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"canvassimple"]];
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"ira_backdrop"]];
     
     audioGraph = [[VLFAudioGraph alloc] init];
     [audioGraph setupAudioSession];
@@ -118,18 +110,6 @@
     [self addRecordButton];
     [self addLoopButtons];
     [self addTableView];
-    
-    CGRect bounds = [[UIScreen mainScreen] bounds];
-    
-    UIView *bottomBar = [[UIView alloc] initWithFrame:CGRectMake(0, bounds.size.height - 50, bounds.size.width, 40)];
-    bottomBar.backgroundColor = [UIColor colorWithWhite:1.0 alpha:1.0];
-    
-    bottomBar.layer.shadowOffset = CGSizeMake(0, 0);
-    bottomBar.layer.shadowColor = [[UIColor blackColor] CGColor];
-    bottomBar.layer.shadowOpacity = 0.4;
-    bottomBar.layer.shadowRadius = 1.0;
-    
-    [self.view addSubview:bottomBar];
     
     [super viewDidLoad];
 }

@@ -30,8 +30,8 @@ static Float32 const kMicrophoneGain = 20;
     BOOL recording;
     BOOL graphEnabled;
     
-    float _micPeak;
     float _micAverage;
+    int _micAverageCount;
 }
 @end
 
@@ -127,16 +127,18 @@ static OSStatus MicrophoneCallback (void *inRefCon,
         
         float avg = 0.0;
         vDSP_meamgv(ioData->mBuffers[0].mData, 1, &avg, inNumberFrames);
-        graph->_micAverage = avg;
+        
+        graph->_micAverageCount++;
+        graph->_micAverage += avg;
     }
     
     return noErr;
 }
 
-//static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *bufferList, OSStatus status)
-//{
-//    NSLog(@"File COMPLETE");
-//}
+static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *bufferList, OSStatus status)
+{
+    NSLog(@"File COMPLETE");
+}
 
 - (void)notifyNoInputAvailable
 {
@@ -150,7 +152,11 @@ static OSStatus MicrophoneCallback (void *inRefCon,
 
 - (float)getMicrophoneAverageDecibels
 {
-    return _micAverage;
+    float average = _micAverage / _micAverageCount;
+    _micAverage = 0.0;
+    _micAverageCount = 0;
+    
+    return average;
 }
 
 - (Float64)currentHardwareSampleRate
@@ -316,7 +322,7 @@ static OSStatus MicrophoneCallback (void *inRefCon,
     
     [self printASBD:_notifierASBD];
     
-    CheckError(AudioUnitAddRenderNotify(_mixerUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
+    CheckError(AudioUnitAddRenderNotify(dpUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
     
     // microphone chain
     CheckError(AUGraphConnectNodeInput(graph, rio, 1,       mixer, 0),      "plug");
@@ -497,7 +503,7 @@ static OSStatus MicrophoneCallback (void *inRefCon,
     self->recording = NO;
     
     _micAverage = 0.0;
-    _micPeak = 0.0;
+    _micAverageCount = 0;
     
     CheckError(AudioSessionInitialize(NULL, kCFRunLoopDefaultMode, InterruptionListener, (__bridge void *)self),
                "couldn't initialize audio session");
