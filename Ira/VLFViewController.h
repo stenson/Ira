@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "VLFAudioGraph.h"
-#import "VLFLoopButton.h"
+#import "VLFLoopControl.h"
 #import "VLFRecordButton.h"
 #import "VLFTableViewController.h"
 

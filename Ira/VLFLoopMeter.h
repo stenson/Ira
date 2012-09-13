@@ -1,13 +1,13 @@
 //
-//  VLFLoopButton.h
+//  VLFLoopMeter.h
 //  Ira
 //
-//  Created by Robert Stenson on 9/13/12.
+//  Created by Robert Stenson on 9/12/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
-@interface VLFLoopButton : UIButton
+@interface VLFLoopMeter : UIButton
 
 @end

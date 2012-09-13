@@ -25,13 +25,15 @@
 		9853A2A215F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A115F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png */; };
 		9853A2A415F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A315F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png */; };
 		9853A2A61600239600863CD1 /* ira_backdrop.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A51600239600863CD1 /* ira_backdrop.png */; };
+		9853A2A91601BAE700863CD1 /* VLFLoopMeter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9853A2A81601BAE700863CD1 /* VLFLoopMeter.m */; };
+		9853A2AC1601BCBB00863CD1 /* VLFLoopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9853A2AB1601BCBB00863CD1 /* VLFLoopButton.m */; };
 		9866BE3615E20AAC00616193 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9866BE3515E20AAC00616193 /* QuartzCore.framework */; };
 		9866BE3B15E495F700616193 /* canvassimple@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3A15E495F700616193 /* canvassimple@2x.png */; };
 		9866BE3D15E4AB7A00616193 /* ukulele.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3C15E4AB6000616193 /* ukulele.m4a */; };
 		986F462315F5334900BD8508 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 986F462215F5334900BD8508 /* Accelerate.framework */; };
 		9899994915D0E2AF001CEB68 /* neworleans.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9899994815D0D7AC001CEB68 /* neworleans.m4a */; };
 		989A492415DAF86B0093ECAC /* doowop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 989A492315DAF8600093ECAC /* doowop.m4a */; };
-		989A493615DD1F130093ECAC /* VLFLoopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 989A493515DD1F130093ECAC /* VLFLoopButton.m */; };
+		989A493615DD1F130093ECAC /* VLFLoopControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 989A493515DD1F130093ECAC /* VLFLoopControl.m */; };
 		98A3CBD115CB86C000C13711 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98A3CBD015CB86C000C13711 /* AVFoundation.framework */; };
 		98ED2A4C15DEEC950035A53B /* fiddle2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A4B15DEEC840035A53B /* fiddle2.m4a */; };
 		98ED2A5615DF00C80035A53B /* canvassimple.png in Resources */ = {isa = PBXBuildFile; fileRef = 98ED2A5515DF00C80035A53B /* canvassimple.png */; };
@@ -66,6 +68,10 @@
 		9853A2A115F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Screen Shot 2012-09-06 at 12.19.09 AM.png"; sourceTree = "<group>"; };
 		9853A2A315F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Screen Shot 2012-09-06 at 12.21.40 AM.png"; sourceTree = "<group>"; };
 		9853A2A51600239600863CD1 /* ira_backdrop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ira_backdrop.png; path = ../../ira_backdrop.png; sourceTree = "<group>"; };
+		9853A2A71601BAE700863CD1 /* VLFLoopMeter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFLoopMeter.h; sourceTree = "<group>"; };
+		9853A2A81601BAE700863CD1 /* VLFLoopMeter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFLoopMeter.m; sourceTree = "<group>"; };
+		9853A2AA1601BCBB00863CD1 /* VLFLoopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFLoopButton.h; sourceTree = "<group>"; };
+		9853A2AB1601BCBB00863CD1 /* VLFLoopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFLoopButton.m; sourceTree = "<group>"; };
 		9866BE3515E20AAC00616193 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9866BE3A15E495F700616193 /* canvassimple@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "canvassimple@2x.png"; path = "../../canvassimple@2x.png"; sourceTree = "<group>"; };
 		9866BE3C15E4AB6000616193 /* ukulele.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = ukulele.m4a; path = ../../ukulele.m4a; sourceTree = "<group>"; };
@@ -73,8 +79,8 @@
 		9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFAudioUtilities.h; sourceTree = "<group>"; };
 		9899994815D0D7AC001CEB68 /* neworleans.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = neworleans.m4a; sourceTree = "<group>"; };
 		989A492315DAF8600093ECAC /* doowop.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = doowop.m4a; path = "../../../Library/Application Support/iPhone Simulator/5.1/Applications/078F6802-F339-429D-92C8-7DE4FB47B4C4/Documents/doowop.m4a"; sourceTree = "<group>"; };
-		989A493415DD1F130093ECAC /* VLFLoopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFLoopButton.h; sourceTree = "<group>"; };
-		989A493515DD1F130093ECAC /* VLFLoopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFLoopButton.m; sourceTree = "<group>"; };
+		989A493415DD1F130093ECAC /* VLFLoopControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFLoopControl.h; sourceTree = "<group>"; };
+		989A493515DD1F130093ECAC /* VLFLoopControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFLoopControl.m; sourceTree = "<group>"; };
 		98A3CBD015CB86C000C13711 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		98ED2A4B15DEEC840035A53B /* fiddle2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = fiddle2.m4a; path = ../../fiddle2.m4a; sourceTree = "<group>"; };
 		98ED2A5515DF00C80035A53B /* canvassimple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = canvassimple.png; path = ../../canvassimple.png; sourceTree = "<group>"; };
@@ -148,10 +154,14 @@
 				02C2D89F15A4B31900C46968 /* VLFAudioGraph.h */,
 				02C2D8A015A4B31900C46968 /* VLFAudioGraph.m */,
 				9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */,
-				989A493415DD1F130093ECAC /* VLFLoopButton.h */,
-				989A493515DD1F130093ECAC /* VLFLoopButton.m */,
+				989A493415DD1F130093ECAC /* VLFLoopControl.h */,
+				989A493515DD1F130093ECAC /* VLFLoopControl.m */,
 				98366E3E15F08942009841A8 /* VLFRecordButton.h */,
 				98366E3F15F08942009841A8 /* VLFRecordButton.m */,
+				9853A2A71601BAE700863CD1 /* VLFLoopMeter.h */,
+				9853A2A81601BAE700863CD1 /* VLFLoopMeter.m */,
+				9853A2AA1601BCBB00863CD1 /* VLFLoopButton.h */,
+				9853A2AB1601BCBB00863CD1 /* VLFLoopButton.m */,
 			);
 			path = Ira;
 			sourceTree = "<group>";
@@ -259,9 +269,11 @@
 				02C2D88F15A4A92000C46968 /* VLFAppDelegate.m in Sources */,
 				02C2D89215A4A92000C46968 /* VLFViewController.m in Sources */,
 				02C2D8A115A4B31900C46968 /* VLFAudioGraph.m in Sources */,
-				989A493615DD1F130093ECAC /* VLFLoopButton.m in Sources */,
+				989A493615DD1F130093ECAC /* VLFLoopControl.m in Sources */,
 				9821892615DECF2300DEA89A /* VLFTableViewController.m in Sources */,
 				98366E4015F08942009841A8 /* VLFRecordButton.m in Sources */,
+				9853A2A91601BAE700863CD1 /* VLFLoopMeter.m in Sources */,
+				9853A2AC1601BCBB00863CD1 /* VLFLoopButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

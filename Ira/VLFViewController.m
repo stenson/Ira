@@ -65,10 +65,9 @@
     for (NSString *title in titles) {
         CGFloat x = frame.origin.x + ((i % 2) * xDim);
         CGFloat y = frame.origin.y + (floorf((i / 2)) * yDim);
-        NSLog(@"%f %f", x, y);
         CGRect rect = CGRectMake(x, y, xDim, yDim);
         
-        VLFLoopButton *button = [[VLFLoopButton alloc] initWithFrame:rect audioUnitIndex:[audioGraph fetchFilePlayer] audioGraph:audioGraph andLoopTitle:title];
+        VLFLoopControl *button = [[VLFLoopControl alloc] initWithFrame:rect audioUnitIndex:[audioGraph fetchFilePlayer] audioGraph:audioGraph andLoopTitle:title];
         
         [self.view addSubview:button];
         i++;

@@ -1,14 +1,14 @@
 //
-//  VLFLoopButton.m
+//  VLFLoopMeter.m
 //  Ira
 //
-//  Created by Robert Stenson on 9/13/12.
+//  Created by Robert Stenson on 9/12/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "VLFLoopButton.h"
+#import "VLFLoopMeter.h"
 
-@implementation VLFLoopButton
+@implementation VLFLoopMeter
 
 - (id)initWithFrame:(CGRect)frame
 {
