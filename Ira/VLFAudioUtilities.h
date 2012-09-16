@@ -56,4 +56,16 @@ static UInt32 audioFileDuration(AudioFileID afid, AudioStreamBasicDescription as
     return (UInt32)totalFrames;
 }
 
+static UInt32 playableFramesInURL(CFURLRef url)
+{
+    AudioFileID recordedFile;
+    CheckError(AudioFileOpenURL(url, kAudioFileReadPermission, 0, &recordedFile), "read");
+    
+    AudioStreamBasicDescription fileASBD;
+    UInt32 asbdSize = sizeof(fileASBD);
+    CheckError(AudioFileGetProperty(recordedFile, kAudioFilePropertyDataFormat, &asbdSize, &fileASBD), "file format");
+    
+    return audioFileDuration(recordedFile, fileASBD);
+}
+
 #endif

@@ -9,13 +9,16 @@
 #import "VLFViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define RECORD_BUTTON_RECT CGRectMake(30, 40, 200, 200)
+#define RECORD_BUTTON_RECT CGRectMake(29, 35, 200, 200)
+#define OUTER_RECORD_RECT CGRectMake(0, 40, 256, 222)
 #define LOOP_BUTTONS_RECT CGRectMake(0, 230, 256, 222)
 
 @interface VLFViewController () {
     VLFAudioGraph *audioGraph;
+    
     UIButton *standby;
     VLFRecordButton *record;
+    VLFBackgroundView *_background;
     
     UITableView *_recordings;
     VLFTableViewController *_recordingsController;
@@ -99,13 +102,23 @@
     [[self view] addSubview:_recordingsController.view];
 }
 
+- (void)addBackgroundView
+{
+    _background = [[VLFBackgroundView alloc] initWithFrame:self.view.frame];
+    _background.recordRect = OUTER_RECORD_RECT;
+    _background.loopsRect = LOOP_BUTTONS_RECT;
+    
+    [self.view addSubview:_background];
+}
+
 - (void)viewDidLoad
 {
-    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"ira_backdrop"]];
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"canvassimple"]];
     
     audioGraph = [[VLFAudioGraph alloc] init];
     [audioGraph setupAudioSession];
     
+    [self addBackgroundView];
     [self addRecordButton];
     [self addLoopButtons];
     [self addTableView];

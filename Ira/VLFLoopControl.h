@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AudioToolbox/AudioToolbox.h>
 #import <QuartzCore/QuartzCore.h>
 #import "VLFAudioGraph.h"
 #import "VLFAudioUtilities.h"
+#import "VLFLoopMeter.h"
+#import "VLFLoopButton.h"
 
 @interface VLFLoopControl : UIButton
 

@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AudioToolbox/AudioToolbox.h>
+#import "VLFAudioUtilities.h"
 
 @interface VLFLoopButton : UIButton
+
+- (void)addUnit:(AudioUnit)unit andURL:(CFURLRef)url;
+- (void)reset;
 
 @end

@@ -325,16 +325,21 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     CheckError(AudioUnitAddRenderNotify(dpUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
     
     // microphone chain
-    CheckError(AUGraphConnectNodeInput(graph, rio, 1,       mixer, 0),      "plug");
-    CheckError(AUGraphConnectNodeInput(graph, mixer, 0,     eq, 0),         "plug");
-    CheckError(AUGraphConnectNodeInput(graph, eq, 0,        eq2, 0),        "plug");
-    CheckError(AUGraphConnectNodeInput(graph, eq2, 0,       eq3, 0),        "plug");
-    CheckError(AUGraphConnectNodeInput(graph, eq3, 0,       eq4, 0),        "plug");
-    CheckError(AUGraphConnectNodeInput(graph, eq4, 0,       lowpass, 0),    "plug");
-    CheckError(AUGraphConnectNodeInput(graph, lowpass, 0,   dp, 0),         "plug");
-    
-    // to final mixer
-    CheckError(AUGraphConnectNodeInput(graph, dp, 0, _finalMix, 0), "plug");
+    if (YES) {
+        CheckError(AUGraphConnectNodeInput(graph, rio, 1, mixer, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, mixer, 0, eq, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, eq, 0, eq2, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, eq2, 0, eq3, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, eq3, 0, eq4, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, eq4, 0, lowpass, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, lowpass, 0, dp, 0), "plug");
+        // end of effects chain
+        CheckError(AUGraphConnectNodeInput(graph, dp, 0, _finalMix, 0), "plug");
+    } else {
+        // no effects
+        CheckError(AUGraphConnectNodeInput(graph, mixer, 0, _finalMix, 0), "plug");
+    }
+
     CheckError(AUGraphConnectNodeInput(graph, filePlayer, 0, converter, 0), "plug");
     CheckError(AUGraphConnectNodeInput(graph, converter, 0, _finalMix, 1), "plug");
     

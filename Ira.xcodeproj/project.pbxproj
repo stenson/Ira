@@ -24,9 +24,9 @@
 		9853A2A015F885A800863CD1 /* facesmall.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A29F15F885A800863CD1 /* facesmall.png */; };
 		9853A2A215F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A115F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png */; };
 		9853A2A415F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A315F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png */; };
-		9853A2A61600239600863CD1 /* ira_backdrop.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A51600239600863CD1 /* ira_backdrop.png */; };
 		9853A2A91601BAE700863CD1 /* VLFLoopMeter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9853A2A81601BAE700863CD1 /* VLFLoopMeter.m */; };
 		9853A2AC1601BCBB00863CD1 /* VLFLoopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 9853A2AB1601BCBB00863CD1 /* VLFLoopButton.m */; };
+		9853A2AF1602C58A00863CD1 /* VLFBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9853A2AE1602C58A00863CD1 /* VLFBackgroundView.m */; };
 		9866BE3615E20AAC00616193 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9866BE3515E20AAC00616193 /* QuartzCore.framework */; };
 		9866BE3B15E495F700616193 /* canvassimple@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3A15E495F700616193 /* canvassimple@2x.png */; };
 		9866BE3D15E4AB7A00616193 /* ukulele.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3C15E4AB6000616193 /* ukulele.m4a */; };
@@ -67,11 +67,12 @@
 		9853A29F15F885A800863CD1 /* facesmall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = facesmall.png; sourceTree = "<group>"; };
 		9853A2A115F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Screen Shot 2012-09-06 at 12.19.09 AM.png"; sourceTree = "<group>"; };
 		9853A2A315F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Screen Shot 2012-09-06 at 12.21.40 AM.png"; sourceTree = "<group>"; };
-		9853A2A51600239600863CD1 /* ira_backdrop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ira_backdrop.png; path = ../../ira_backdrop.png; sourceTree = "<group>"; };
 		9853A2A71601BAE700863CD1 /* VLFLoopMeter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFLoopMeter.h; sourceTree = "<group>"; };
 		9853A2A81601BAE700863CD1 /* VLFLoopMeter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFLoopMeter.m; sourceTree = "<group>"; };
 		9853A2AA1601BCBB00863CD1 /* VLFLoopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFLoopButton.h; sourceTree = "<group>"; };
 		9853A2AB1601BCBB00863CD1 /* VLFLoopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFLoopButton.m; sourceTree = "<group>"; };
+		9853A2AD1602C58A00863CD1 /* VLFBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFBackgroundView.h; sourceTree = "<group>"; };
+		9853A2AE1602C58A00863CD1 /* VLFBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFBackgroundView.m; sourceTree = "<group>"; };
 		9866BE3515E20AAC00616193 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9866BE3A15E495F700616193 /* canvassimple@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "canvassimple@2x.png"; path = "../../canvassimple@2x.png"; sourceTree = "<group>"; };
 		9866BE3C15E4AB6000616193 /* ukulele.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = ukulele.m4a; path = ../../ukulele.m4a; sourceTree = "<group>"; };
@@ -162,6 +163,8 @@
 				9853A2A81601BAE700863CD1 /* VLFLoopMeter.m */,
 				9853A2AA1601BCBB00863CD1 /* VLFLoopButton.h */,
 				9853A2AB1601BCBB00863CD1 /* VLFLoopButton.m */,
+				9853A2AD1602C58A00863CD1 /* VLFBackgroundView.h */,
+				9853A2AE1602C58A00863CD1 /* VLFBackgroundView.m */,
 			);
 			path = Ira;
 			sourceTree = "<group>";
@@ -169,7 +172,6 @@
 		02C2D88515A4A92000C46968 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				9853A2A51600239600863CD1 /* ira_backdrop.png */,
 				98F24E4615F048A500BB68CD /* newmark.m4a */,
 				98F24E4415EDF20400BB68CD /* image.png */,
 				9866BE3C15E4AB6000616193 /* ukulele.m4a */,
@@ -254,7 +256,6 @@
 				9853A2A015F885A800863CD1 /* facesmall.png in Resources */,
 				9853A2A215F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png in Resources */,
 				9853A2A415F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png in Resources */,
-				9853A2A61600239600863CD1 /* ira_backdrop.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,6 +275,7 @@
 				98366E4015F08942009841A8 /* VLFRecordButton.m in Sources */,
 				9853A2A91601BAE700863CD1 /* VLFLoopMeter.m in Sources */,
 				9853A2AC1601BCBB00863CD1 /* VLFLoopButton.m in Sources */,
+				9853A2AF1602C58A00863CD1 /* VLFBackgroundView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

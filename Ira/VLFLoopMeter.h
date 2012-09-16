@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "VLFLoopControl.h"
 
 @interface VLFLoopMeter : UIButton
+
+@property (nonatomic) Float32 gain;
+
+- (void)fade;
 
 @end

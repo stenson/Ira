@@ -11,6 +11,7 @@
 #import "VLFLoopControl.h"
 #import "VLFRecordButton.h"
 #import "VLFTableViewController.h"
+#import "VLFBackgroundView.h"
 
 @interface VLFViewController : UIViewController
 - (void)restartAudioGraph;

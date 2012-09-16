@@ -66,7 +66,7 @@ static const CGFloat kRecordingRed[4] = { 1.f, .2f, .2f, 1.f };
     CGContextFillEllipseInRect(context, inputRect);
     
     CGContextSetRGBStrokeColor(context, 1.f, 1.f, 1.f, 1.f);
-    CGContextStrokeEllipseInRect(context, CGRectInset(inputRect, 3.f, 2.5f));
+    CGContextStrokeEllipseInRect(context, CGRectInset(inputRect, 3.f, 3.f));
     
     UIFont *bigBold = [UIFont boldSystemFontOfSize:20];
     CGFloat typeOffset = ((allRect.size.height - bigBold.pointSize) / 2.f) - 3.f;
