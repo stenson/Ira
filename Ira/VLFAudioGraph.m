@@ -12,6 +12,8 @@
 static NSString * const kRecordedFileName = @"%@/recorded-program-output.m4a";
 static Float32 const kMicrophoneGain = 20;
 
+static const Float32 nBandEQDecibels[10] = { 13.2, 11.6, 9.4, -1.1, -2.8, -3.5, -5.4, -1.2, 4.3, -12.0 };
+
 @interface VLFAudioGraph () {
     AUGraph graph;
     AudioUnit eqUnit;
@@ -277,10 +279,22 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
                     releaseTime: 0.0
                         andGain: kMicrophoneGain];
     
+    
+    
     UInt32 maxBands;
     UInt32 maxBandsSize = sizeof(maxBands);
     CheckError(AudioUnitGetProperty(nBandEqUnit, kAUNBandEQProperty_MaxNumberOfBands, kAudioUnitScope_Global, 0, &maxBands, &maxBandsSize), "max bands");
     NSLog(@"MAX BANDS %lu", maxBands);
+    
+    UInt32 numBands = 10;
+    CheckError(AudioUnitSetProperty(nBandEqUnit, kAUNBandEQProperty_NumberOfBands, kAudioUnitScope_Global, 0, &numBands, sizeof(numBands)), "set bands");
+    
+    float lowestPower = 5.f;
+    for (int i = 0; i < 10; i++) {
+        CheckError(AudioUnitSetParameter(nBandEqUnit, kAUNBandEQParam_Frequency + i, kAudioUnitScope_Global, 0, powf(2.f, lowestPower+i), 0), "nband freq");
+        
+        CheckError(AudioUnitSetParameter(nBandEqUnit, kAUNBandEQParam_Gain + i, kAudioUnitScope_Global, 0, nBandEQDecibels[i], 0), "nband gain");
+    }
     
     CheckError(AudioUnitSetParameter(lowpassUnit, kLowPassParam_CutoffFrequency, kAudioUnitScope_Global, 0, 20000.0, 0), "cut freq");
 
@@ -316,14 +330,9 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     
     CheckError(AudioUnitSetProperty(converterUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &effectASBD, asbdSize), "asbd on converter");
     
-    [self printASBD:effectASBD];
-    NSLog(@"\n\n");
-    
     AudioUnit notifierUnit = _finalMixUnit;
     CheckError(AudioUnitAddRenderNotify(notifierUnit, &RecordingCallback, (__bridge void*)self), "render notify");
     CheckError(AudioUnitGetProperty(notifierUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &_notifierASBD, &asbdSize), "notifier ABSD");
-    
-    [self printASBD:_notifierASBD];
     
     CheckError(AudioUnitAddRenderNotify(lowpassUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
     
