@@ -11,7 +11,7 @@
 
 #define RECORD_BUTTON_RECT CGRectMake(29, 35, 200, 200)
 #define OUTER_RECORD_RECT CGRectMake(0, 40, 256, 222)
-#define LOOP_BUTTONS_RECT CGRectMake(0, 230, 256, 222)
+#define LOOP_BUTTONS_RECT CGRectMake(0, 250, 334, 202)
 
 @interface VLFViewController () {
     VLFAudioGraph *audioGraph;
@@ -60,15 +60,14 @@
     NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"newmark", @"ukulele", @"fiddle2", nil];
     CGRect frame = LOOP_BUTTONS_RECT;
     
-    CGFloat xDim = frame.size.width / 2;
-    CGFloat yDim = frame.size.height / 2;
+    CGFloat xDim = frame.size.width / 4;
+    CGFloat yDim = frame.size.height;
     
     int i = 0;
     
     for (NSString *title in titles) {
-        CGFloat x = frame.origin.x + ((i % 2) * xDim);
-        CGFloat y = frame.origin.y + (floorf((i / 2)) * yDim);
-        CGRect rect = CGRectMake(x, y, xDim, yDim);
+        CGFloat x = frame.origin.x + 0 + xDim * i;
+        CGRect rect = CGRectMake(x, frame.origin.y, xDim, yDim);
         
         VLFLoopControl *button = [[VLFLoopControl alloc] initWithFrame:rect audioUnitIndex:[audioGraph fetchFilePlayer] audioGraph:audioGraph andLoopTitle:title];
         
@@ -93,11 +92,6 @@
     
     _recordingsController.tableView.frame = CGRectMake(fifth*4, 0, fifth*2, size.height);
     _recordingsController.tableView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
-    
-    _recordingsController.tableView.layer.shadowOffset = CGSizeMake(0, 0);
-    _recordingsController.tableView.layer.shadowColor = [[UIColor blackColor] CGColor];
-    _recordingsController.tableView.layer.shadowOpacity = 0.5;
-    _recordingsController.tableView.layer.shadowRadius = 1.0;
     
     [[self view] addSubview:_recordingsController.view];
 }

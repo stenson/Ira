@@ -75,9 +75,9 @@
     CGRect allRect = self.bounds;
     
     CGContextBeginPath(context);
-    CGFloat cellHeight = allRect.size.height / 20;
+    CGFloat cellHeight = 1;
     int i = 0;
-    for (i = 0; i < 13; i++) {
+    for (i = 0; i < 50; i++) {
         CGContextAddRect(context, CGRectMake(0, cellHeight*i + 2*i, allRect.size.width, cellHeight));
     }
     CGContextClosePath(context);

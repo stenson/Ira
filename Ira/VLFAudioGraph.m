@@ -59,9 +59,6 @@ static Float32 const kMicrophoneGain = 20;
     
     UInt32 framesToPlay = numPackets * fileASBD.mFramesPerPacket;
     
-    UInt32 playableFrames;
-    playableFrames = audioFileDuration(recordedFile, fileASBD);
-    
     ScheduledAudioFileRegion rgn;
     memset(&rgn.mTimeStamp, 0, sizeof(rgn.mTimeStamp));
     rgn.mTimeStamp.mFlags = kAudioTimeStampSampleTimeValid;
@@ -84,7 +81,7 @@ static Float32 const kMicrophoneGain = 20;
     CheckError(AudioUnitSetProperty(unit, kAudioUnitProperty_ScheduleStartTimeStamp, kAudioUnitScope_Global, 0, &startTime, sizeof(startTime)),
                "start time");
     
-    return playableFrames;
+    return 0;
 }
 
 static void InterruptionListener (void *inUserData, UInt32 inInterruptionState) {
@@ -100,9 +97,6 @@ static OSStatus RecordingCallback (void *inRefCon,
 {
     if (*ioActionFlags & kAudioUnitRenderAction_PostRender) {
         VLFAudioGraph *ag = (__bridge VLFAudioGraph *)inRefCon;
-        
-//        AudioSampleType *buffer = (AudioSampleType *)ioData->mBuffers[0].mData;
-//        printf("%d\n", MAX(abs(buffer[0])-10000, 0));
         
         if (ag->recording) {
             CheckError(ExtAudioFileWriteAsync(ag->outputFile, inNumberFrames, ioData), "write to file");
@@ -243,6 +237,8 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     AUNode eq3 = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_ParametricEQ];
     AUNode eq4 = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_ParametricEQ];
     
+    AUNode nBandEq = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_NBandEQ];
+    
     AUNode lowpass = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_LowPassFilter];
     AUNode dp = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_DynamicsProcessor];
     
@@ -254,12 +250,14 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     CheckError(AUGraphOpen(graph), "open graph");
     
     AudioUnit dpUnit;
+    AudioUnit nBandEqUnit;
     AudioUnit lowpassUnit;
     AudioUnit converterUnit;
     
     CheckError(AUGraphNodeInfo(graph, dp, NULL, &dpUnit), "dpUnit");
     CheckError(AUGraphNodeInfo(graph, rio, NULL, &_rioUnit), "rioUnit");
     CheckError(AUGraphNodeInfo(graph, mixer, NULL, &_mixerUnit), "mixerUnit");
+    CheckError(AUGraphNodeInfo(graph, nBandEq, NULL, &nBandEqUnit), "nbandeqUnit");
     CheckError(AUGraphNodeInfo(graph, lowpass, NULL, &lowpassUnit), "lowpassUnit");
     CheckError(AUGraphNodeInfo(graph, _finalMix, NULL, &_finalMixUnit), "finalMixUnit");
     CheckError(AUGraphNodeInfo(graph, converter, NULL, &converterUnit), "converterUnit");
@@ -278,6 +276,11 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
                      attackTime: 0.03
                     releaseTime: 0.0
                         andGain: kMicrophoneGain];
+    
+    UInt32 maxBands;
+    UInt32 maxBandsSize = sizeof(maxBands);
+    CheckError(AudioUnitGetProperty(nBandEqUnit, kAUNBandEQProperty_MaxNumberOfBands, kAudioUnitScope_Global, 0, &maxBands, &maxBandsSize), "max bands");
+    NSLog(@"MAX BANDS %lu", maxBands);
     
     CheckError(AudioUnitSetParameter(lowpassUnit, kLowPassParam_CutoffFrequency, kAudioUnitScope_Global, 0, 20000.0, 0), "cut freq");
 
@@ -322,19 +325,22 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     
     [self printASBD:_notifierASBD];
     
-    CheckError(AudioUnitAddRenderNotify(dpUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
+    CheckError(AudioUnitAddRenderNotify(lowpassUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
+    
+    CheckError(AUGraphConnectNodeInput(graph, rio, 1, mixer, 0), "plug");
     
     // microphone chain
     if (YES) {
-        CheckError(AUGraphConnectNodeInput(graph, rio, 1, mixer, 0), "plug");
-        CheckError(AUGraphConnectNodeInput(graph, mixer, 0, eq, 0), "plug");
-        CheckError(AUGraphConnectNodeInput(graph, eq, 0, eq2, 0), "plug");
-        CheckError(AUGraphConnectNodeInput(graph, eq2, 0, eq3, 0), "plug");
-        CheckError(AUGraphConnectNodeInput(graph, eq3, 0, eq4, 0), "plug");
-        CheckError(AUGraphConnectNodeInput(graph, eq4, 0, lowpass, 0), "plug");
-        CheckError(AUGraphConnectNodeInput(graph, lowpass, 0, dp, 0), "plug");
+//        CheckError(AUGraphConnectNodeInput(graph, mixer, 0, eq, 0), "plug");
+//        CheckError(AUGraphConnectNodeInput(graph, eq, 0, eq2, 0), "plug");
+//        CheckError(AUGraphConnectNodeInput(graph, eq2, 0, eq3, 0), "plug");
+//        CheckError(AUGraphConnectNodeInput(graph, eq3, 0, eq4, 0), "plug");
+//        CheckError(AUGraphConnectNodeInput(graph, eq4, 0, lowpass, 0), "plug");
+        //CheckError(AUGraphConnectNodeInput(graph, lowpass, 0, dp, 0), "plug");
         // end of effects chain
-        CheckError(AUGraphConnectNodeInput(graph, dp, 0, _finalMix, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, mixer, 0, nBandEq, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, nBandEq, 0, lowpass, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, lowpass, 0, _finalMix, 0), "plug");
     } else {
         // no effects
         CheckError(AUGraphConnectNodeInput(graph, mixer, 0, _finalMix, 0), "plug");
@@ -440,6 +446,23 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     UInt32 codecSize = sizeof(codec);
     CheckError(ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_CodecManufacturer, codecSize, &codec), "set codec");
     
+    UInt32 convSize = sizeof(AudioConverterRef);
+    AudioConverterRef convRef = NULL;
+    CheckError(ExtAudioFileGetProperty(outputFile, kExtAudioFileProperty_AudioConverter, &convSize, &convRef), "converter");
+    
+    UInt32 bitRateSize = sizeof(UInt32);
+    UInt32 bitRate = 64000;
+    CheckError(AudioConverterSetProperty(convRef, kAudioConverterEncodeBitRate, bitRateSize, &bitRate), "bit rate");
+    NSLog(@"BIT RATE %lu", bitRate);
+    
+//    UInt32 codecQuality;
+//    UInt32 codecQualitySize = sizeof(UInt32);
+//    CheckError(AudioConverterGetProperty(convRef, kAudioConverterCodecQuality, &codecQualitySize, &codecQuality), "codec quality");
+//    NSLog(@"QUALITY %lu", codecQuality);
+    
+    CFArrayRef config = NULL;
+    CheckError(ExtAudioFileSetProperty(outputFile, kExtAudioFileProperty_ConverterConfig, sizeof(config), &config), "config");
+    
     CheckError(ExtAudioFileWriteAsync(outputFile, 0, NULL), "prime");
     ExtAudioFileSeek(outputFile, 0);
     
@@ -452,7 +475,7 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     memset(&asbd, 0, sizeof(asbd));
     UInt32 asbdSize = sizeof(asbd);
     
-    asbd.mChannelsPerFrame = 2;
+    asbd.mChannelsPerFrame = 1;
     asbd.mFormatID = kAudioFormatMPEG4AAC;
     
     CheckError(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &asbdSize, &asbd), "complete asbd for aac");

@@ -12,11 +12,7 @@ static UInt32 const kLoopNotFading = 0;
 static UInt32 const kLoopFadingIn = 1;
 static UInt32 const kLoopFadingOut = 2;
 static UInt32 const kLoopFullVolume = 3;
-
-static Float32 const kProgressAnimationMS = 0.016;
-
-static Float32 const kDragGainLowerBound = 0.1;
-static double const kTapTolerance = 0.1;
+static Float32 const kDragGainLowerBound = 0.0;
 
 @interface VLFLoopControl () {
     VLFAudioGraph *_graph;
@@ -37,8 +33,6 @@ static double const kTapTolerance = 0.1;
 
 @implementation VLFLoopControl
 
-#pragma mark callbacks
-
 #pragma mark public
 
 - (id)initWithFrame:(CGRect)frame audioUnitIndex:(int)index audioGraph:(VLFAudioGraph *)graph andLoopTitle:(NSString *)loopTitle
@@ -46,7 +40,7 @@ static double const kTapTolerance = 0.1;
     self = [super initWithFrame:frame];
     if (self) {
         
-        self.opaque = NO;
+        self.opaque = YES;
         
         _unitIndex = index;
         _graph = graph;
@@ -61,15 +55,14 @@ static double const kTapTolerance = 0.1;
         CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateGraphics:)];
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
-        CGFloat meterWidth = self.bounds.size.width / 4;
-        CGRect loopMeterRect = CGRectMake(self.bounds.size.width - meterWidth, 15, meterWidth - 15, self.bounds.size.height - 15);
+        CGRect loopMeterRect = CGRectMake(0, 5, self.frame.size.width, self.bounds.size.height - 120);
         _meter = [[VLFLoopMeter alloc] initWithFrame:loopMeterRect];
         _meter.gain = 0.0;
         [self addSubview:_meter];
         
         [_meter addObserver:self forKeyPath:@"gain" options:NSKeyValueObservingOptionNew context:NULL];
         
-        CGRect buttonRect = CGRectMake(0, 0, meterWidth * 2, meterWidth * 2);
+        CGRect buttonRect = CGRectMake(10, self.frame.size.height - 86, 60, 60);
         _button = [[VLFLoopButton alloc] initWithFrame:buttonRect];
         [_button addUnit:_unit andURL:_loopURLRef];
         [self addSubview:_button];
@@ -83,7 +76,7 @@ static double const kTapTolerance = 0.1;
 {
     if ([keyPath isEqualToString:@"gain"] && object == _meter) {
         [_graph setGain:_meter.gain forMixerInput:_unitIndex];
-        if (_playing && _meter.gain <= 0.1) {
+        if (_playing && _meter.gain <= kDragGainLowerBound) {
             [self stopLoop];
             _meter.gain = 0.0;
         }
@@ -109,9 +102,29 @@ static double const kTapTolerance = 0.1;
     }
 }
 
-//- (void)drawRect:(CGRect)rect
-//{
-//}
+- (void)drawRect:(CGRect)rect
+{
+    CGRect allRect = self.bounds;
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    [[UIColor whiteColor] setFill];
+    CGContextFillRect(context, allRect);
+    
+    int i = 0;
+    for (i = 0; i < 2500; i++) {
+        CGFloat dim = .5f;
+        
+        if (arc4random_uniform(2) > 1) {
+            dim = 1.f;
+            CGContextSetRGBFillColor(context, .9f, .9f, .9f, 1.f);
+        } else {
+            CGContextSetRGBFillColor(context, .8f, .8f, .8f, 1.f);
+        }
+        CGContextFillRect(context, CGRectMake(arc4random_uniform(allRect.size.width),
+                                              arc4random_uniform(allRect.size.height),
+                                              dim, dim));
+    }
+}
 
 #pragma mark private
 
@@ -129,23 +142,5 @@ static double const kTapTolerance = 0.1;
     AudioUnitReset(_unit, kAudioUnitScope_Global, 0);
     [_button reset];
 }
-
-//- (void)fadeOutWithTimer:(NSTimer *)timer
-//{
-//    if (_gain > 0.0) {
-//        [self setGainWithValue:_gain - 0.005];
-//    } else {
-//        [self stopLoop];
-//        [timer invalidate];
-//    }
-//}
-
-//- (void)setGainWithValue:(Float32)gain
-//{
-//    _gain = gain;
-//    _meter.gain = _gain;
-//    [_meter setNeedsDisplay];
-//    [_graph setGain:_gain forMixerInput:_unitIndex];
-//}
 
 @end

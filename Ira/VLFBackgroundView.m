@@ -47,19 +47,17 @@
     CGContextMoveToPoint(context, _recordRect.origin.x, _recordRect.origin.y);
     CGContextAddLineToPoint(context, _recordRect.size.width, _recordRect.origin.y);
     
-    return;
-    
     // top
     CGContextMoveToPoint(context, origin.x, origin.y);
     CGContextAddLineToPoint(context, size.width, origin.y);
     
-    // vertical
-    CGContextMoveToPoint(context, size.width/2, origin.y);
-    CGContextAddLineToPoint(context, size.width/2, origin.y + size.height);
-    
-    // middle
-    CGContextMoveToPoint(context, origin.x, origin.y + size.height/2);
-    CGContextAddLineToPoint(context, size.width, origin.y + size.height/2);
+//    // vertical
+//    CGContextMoveToPoint(context, size.width/2, origin.y);
+//    CGContextAddLineToPoint(context, size.width/2, origin.y + size.height);
+//    
+//    // middle
+//    CGContextMoveToPoint(context, origin.x, origin.y + size.height/2);
+//    CGContextAddLineToPoint(context, size.width, origin.y + size.height/2);
     
     // bottom
     CGContextMoveToPoint(context, origin.x, origin.y + size.height);

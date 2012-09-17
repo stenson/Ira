@@ -61,7 +61,7 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     CGRect allRect = self.bounds;
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    CGFloat inset = 15.f;
+    CGFloat inset = 0.f;
     CGRect circle = CGRectInset(allRect, inset, inset);
     CGContextSetRGBFillColor(context, .3f, .3f, .9f, 1.f);
     CGContextFillEllipseInRect(context, circle);
@@ -88,11 +88,11 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     CGContextRestoreGState(context);
     
     CGContextSetRGBFillColor(context, 1.f, 1.f, 1.f, 1.f);
-    CGRect textRect = CGRectInset(allRect, 0.f, 37.f);
-    [[@"A" substringToIndex:1] drawInRect:textRect
-                                       withFont:[UIFont boldSystemFontOfSize:18]
-                                  lineBreakMode:UILineBreakModeClip
-                                      alignment:UITextAlignmentCenter];
+//    CGRect textRect = CGRectInset(allRect, 0.f, 37.f);
+//    [[@"A" substringToIndex:1] drawInRect:textRect
+//                                       withFont:[UIFont boldSystemFontOfSize:18]
+//                                  lineBreakMode:UILineBreakModeClip
+//                                      alignment:UITextAlignmentCenter];
 }
 
 @end
