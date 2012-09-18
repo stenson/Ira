@@ -9,17 +9,16 @@
 #import "VLFViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define RECORD_BUTTON_RECT CGRectMake(29, 35, 200, 200)
-#define OUTER_RECORD_RECT CGRectMake(0, 40, 256, 222)
-#define LOOP_BUTTONS_RECT CGRectMake(0, 250, 334, 202)
+#define OUTER_RECORD_RECT CGRectMake(0, 28, 222, 222)
+#define LOOP_BUTTONS_RECT CGRectMake(0, 250, 222, 204)
+static const CGFloat kMainWidth = 234;
 
 @interface VLFViewController () {
-    VLFAudioGraph *audioGraph;
-    
-    UIButton *standby;
-    VLFRecordButton *record;
+    VLFAudioGraph *_audioGraph;
+    VLFRecordButton *_record;
     VLFBackgroundView *_background;
     
+    UIScrollView *_loops;
     UITableView *_recordings;
     VLFTableViewController *_recordingsController;
 }
@@ -29,69 +28,55 @@
 
 - (void)restartAudioGraph
 {
-    [audioGraph enableGraph];
+    [_audioGraph enableGraph];
 }
 
 - (void)turnOffAudioGraph
 {
-    [audioGraph disableGraph];
-}
-
-- (void)addStandbyButton
-{
-    standby = [UIButton buttonWithType:UIButtonTypeCustom];
-    [standby setTitle:@"S" forState:UIControlStateNormal];
-    [standby setTitleColor:[UIColor clearColor] forState:UIControlStateNormal];
-    standby.backgroundColor = [UIColor colorWithRed:0.24f green:0.70f blue:0.44f alpha:0.8f];
-    standby.layer.cornerRadius = 25.0f;
-    
-    standby.frame = CGRectMake(15, 315, 50, 50);
-    [[self view] addSubview:standby];
-    [standby addTarget:self action:@selector(standbyPressed) forControlEvents:UIControlEventTouchUpInside];
-}
-
-- (void)standbyPressed
-{
-    NSLog(@"STANDBY STANDBY");
+    [_audioGraph disableGraph];
 }
 
 - (void)addLoopButtons
 {
+    _loops = [[UIScrollView alloc] initWithFrame:LOOP_BUTTONS_RECT];
+    _loops.showsHorizontalScrollIndicator = NO;
+    
     NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"newmark", @"ukulele", @"fiddle2", nil];
     CGRect frame = LOOP_BUTTONS_RECT;
     
-    CGFloat xDim = frame.size.width / 4;
+    CGFloat xDim = floorf(frame.size.width / 3);
     CGFloat yDim = frame.size.height;
     
     int i = 0;
     
     for (NSString *title in titles) {
-        CGFloat x = frame.origin.x + 0 + xDim * i;
-        CGRect rect = CGRectMake(x, frame.origin.y, xDim, yDim);
+        CGRect rect = CGRectMake(0 + xDim * i, 0, xDim, yDim);
         
-        VLFLoopControl *button = [[VLFLoopControl alloc] initWithFrame:rect audioUnitIndex:[audioGraph fetchFilePlayer] audioGraph:audioGraph andLoopTitle:title];
+        VLFLoopControl *button = [[VLFLoopControl alloc] initWithFrame:rect audioUnitIndex:[_audioGraph fetchFilePlayer] audioGraph:_audioGraph andLoopTitle:title];
         
-        [self.view addSubview:button];
+        [_loops addSubview:button];
         i++;
     }
+    
+    _loops.contentSize = CGSizeMake(xDim * titles.count, yDim);
+    [self.view addSubview:_loops];
 }
 
 - (void)addRecordButton
 {
-    record = [[VLFRecordButton alloc] initWithFrame:RECORD_BUTTON_RECT];
-    record.graph = audioGraph;
-    [[self view] addSubview:record];
+    _record = [[VLFRecordButton alloc] initWithFrame:CGRectInset(OUTER_RECORD_RECT, 10, 10)];
+    _record.graph = _audioGraph;
+    [[self view] addSubview:_record];
 }
 
 - (void)addTableView
 {
     _recordingsController = [[VLFTableViewController alloc] initWithStyle:UITableViewStylePlain];
     
-    CGSize size = [[UIScreen mainScreen] bounds].size;
-    CGFloat fifth = size.width/5;
+    CGFloat width = self.view.bounds.size.width - kMainWidth;
     
-    _recordingsController.tableView.frame = CGRectMake(fifth*4, 0, fifth*2, size.height);
-    _recordingsController.tableView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+    _recordingsController.tableView.frame = CGRectMake(kMainWidth, 0, width, self.view.bounds.size.height);
+    _recordingsController.tableView.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1.0];
     
     [[self view] addSubview:_recordingsController.view];
 }
@@ -109,8 +94,8 @@
 {
     self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"canvassimple"]];
     
-    audioGraph = [[VLFAudioGraph alloc] init];
-    [audioGraph setupAudioSession];
+    _audioGraph = [[VLFAudioGraph alloc] init];
+    [_audioGraph setupAudioSession];
     
     [self addBackgroundView];
     [self addRecordButton];

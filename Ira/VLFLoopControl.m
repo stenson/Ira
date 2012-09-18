@@ -40,7 +40,7 @@ static Float32 const kDragGainLowerBound = 0.0;
     self = [super initWithFrame:frame];
     if (self) {
         
-        self.opaque = YES;
+        self.opaque = NO;
         
         _unitIndex = index;
         _graph = graph;
@@ -62,12 +62,24 @@ static Float32 const kDragGainLowerBound = 0.0;
         
         [_meter addObserver:self forKeyPath:@"gain" options:NSKeyValueObservingOptionNew context:NULL];
         
-        CGRect buttonRect = CGRectMake(10, self.frame.size.height - 86, 60, 60);
+        CGRect buttonRect = CGRectMake(8, self.frame.size.height - 106, 60, 60);
         _button = [[VLFLoopButton alloc] initWithFrame:buttonRect];
         [_button addUnit:_unit andURL:_loopURLRef];
         [self addSubview:_button];
         
         [_button addTarget:self action:@selector(handleButtonPressed) forControlEvents:UIControlEventTouchDown];
+        
+        CGFloat size = self.bounds.size.width - 50;
+        UITextView *name = [[UITextView alloc] initWithFrame:CGRectMake(26, self.bounds.size.height - 32, size, size)];
+        name.text = [_loopTitle substringToIndex:1];
+        [self addSubview:name];
+        
+//        UIImageView *face = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"facesmall"]];
+//        CGFloat size = self.bounds.size.width - 50;
+//        face.frame = CGRectMake(26, self.bounds.size.height - 32, size, size);
+//        face.layer.cornerRadius = size / 2;
+//        face.clipsToBounds = YES;
+//        [self addSubview:face];
     }
     return self;
 }
@@ -86,10 +98,8 @@ static Float32 const kDragGainLowerBound = 0.0;
 - (void)handleButtonPressed
 {
     if (!_playing) {
-        NSLog(@"not playing");
         [self playLoop];
     } else {
-        NSLog(@"playing");
         [_meter fade];
     }
 }
@@ -99,30 +109,6 @@ static Float32 const kDragGainLowerBound = 0.0;
 {
     if (_playing) {
         [_button setNeedsDisplay];
-    }
-}
-
-- (void)drawRect:(CGRect)rect
-{
-    CGRect allRect = self.bounds;
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    [[UIColor whiteColor] setFill];
-    CGContextFillRect(context, allRect);
-    
-    int i = 0;
-    for (i = 0; i < 2500; i++) {
-        CGFloat dim = .5f;
-        
-        if (arc4random_uniform(2) > 1) {
-            dim = 1.f;
-            CGContextSetRGBFillColor(context, .9f, .9f, .9f, 1.f);
-        } else {
-            CGContextSetRGBFillColor(context, .8f, .8f, .8f, 1.f);
-        }
-        CGContextFillRect(context, CGRectMake(arc4random_uniform(allRect.size.width),
-                                              arc4random_uniform(allRect.size.height),
-                                              dim, dim));
     }
 }
 
@@ -142,5 +128,15 @@ static Float32 const kDragGainLowerBound = 0.0;
     AudioUnitReset(_unit, kAudioUnitScope_Global, 0);
     [_button reset];
 }
+
+//- (void)drawRect:(CGRect)rect
+//{
+//    CGRect allRect = self.bounds;
+//    CGContextRef context = UIGraphicsGetCurrentContext();
+//    
+//    CGContextSetRGBFillColor(context, .7f, .7f, .7f, .3f);
+//    CGFloat size = allRect.size.width - 50;
+//    CGContextFillRect(context, CGRectMake(26, allRect.size.height - 32, size, size));
+//}
 
 @end

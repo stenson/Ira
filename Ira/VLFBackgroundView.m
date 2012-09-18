@@ -33,8 +33,8 @@
     [self drawLines:context];
     
     CGContextSetRGBFillColor(context, .4f, .4f, .4f, 1.f);
-    UIFont *logotype = [UIFont fontWithName:@"Times New Roman" size:20];
-    [@"Ira" drawInRect:CGRectInset(self.bounds, 8.f, 8.f) withFont:logotype];
+    UIFont *logotype = [UIFont fontWithName:@"Courier-Bold" size:12];
+    [@"Ira" drawInRect:CGRectInset(self.bounds, 8.f, 6.f) withFont:logotype];
 }
 
 - (void)drawLines:(CGContextRef)context
@@ -47,17 +47,12 @@
     CGContextMoveToPoint(context, _recordRect.origin.x, _recordRect.origin.y);
     CGContextAddLineToPoint(context, _recordRect.size.width, _recordRect.origin.y);
     
+    CGContextMoveToPoint(context, size.width + 6, 0);
+    CGContextAddLineToPoint(context, size.width + 6, self.bounds.size.height);
+    
     // top
     CGContextMoveToPoint(context, origin.x, origin.y);
     CGContextAddLineToPoint(context, size.width, origin.y);
-    
-//    // vertical
-//    CGContextMoveToPoint(context, size.width/2, origin.y);
-//    CGContextAddLineToPoint(context, size.width/2, origin.y + size.height);
-//    
-//    // middle
-//    CGContextMoveToPoint(context, origin.x, origin.y + size.height/2);
-//    CGContextAddLineToPoint(context, size.width, origin.y + size.height/2);
     
     // bottom
     CGContextMoveToPoint(context, origin.x, origin.y + size.height);
@@ -65,6 +60,24 @@
     
     // stroke em
     CGContextStrokePath(context);
+    
+    CGContextSetRGBFillColor(context, 1.f, 1.f, 1.f, 1.f);
+    CGContextFillRect(context, _loopsRect);
+    
+    int i = 0;
+    for (i = 0; i < 5000; i++) {
+        CGFloat dim = .5f;
+        
+        if (arc4random_uniform(2) > 1) {
+            dim = 1.5f;
+            CGContextSetRGBFillColor(context, .8f, .8f, .8f, 1.f);
+        } else {
+            CGContextSetRGBFillColor(context, .7f, .7f, .7f, 1.f);
+        }
+        CGContextFillRect(context, CGRectMake(_loopsRect.origin.x + arc4random_uniform(_loopsRect.size.width),
+                                              _loopsRect.origin.y + arc4random_uniform(_loopsRect.size.height),
+                                              dim, dim));
+    }
 }
 
 @end
