@@ -8,6 +8,8 @@
 
 #import "VLFLoopMeter.h"
 
+static const float kFadeIncrement = 0.02;
+
 @interface VLFLoopMeter () {
     BOOL _fading;
     NSTimer *_timer;
@@ -54,7 +56,7 @@
         _fading = NO;
         [_timer invalidate];
     }
-    [self setGain:_gain - 0.005];
+    [self setGain:_gain - kFadeIncrement];
     [self setNeedsDisplay];
 }
 
@@ -65,7 +67,7 @@
         [_timer invalidate];
     } else {
         _fading = YES;
-        _timer = [NSTimer scheduledTimerWithTimeInterval:0.025 target:self selector:@selector(fadeWithTimer:) userInfo:nil repeats:YES];
+        _timer = [NSTimer scheduledTimerWithTimeInterval:0.075 target:self selector:@selector(fadeWithTimer:) userInfo:nil repeats:YES];
     }
 }
 

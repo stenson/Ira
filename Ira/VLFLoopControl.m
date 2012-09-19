@@ -14,9 +14,10 @@ static UInt32 const kLoopFadingOut = 2;
 static UInt32 const kLoopFullVolume = 3;
 static Float32 const kDragGainLowerBound = 0.0;
 
+static const BOOL kTransform = YES;
+
 @interface VLFLoopControl () {
     VLFAudioGraph *_graph;
-    
     VLFLoopMeter *_meter;
     VLFLoopButton *_button;
     
@@ -28,10 +29,38 @@ static Float32 const kDragGainLowerBound = 0.0;
     
     BOOL _playing;
     Float32 _fadingState;
+    
+    UInt32 _framesToPlay;
+    Float32 _percentagePlayed;
 }
 @end
 
 @implementation VLFLoopControl
+
+#pragma mark audio callbacks
+
+static OSStatus UnitRenderCallback (void *inRefCon,
+                                    AudioUnitRenderActionFlags *ioActionFlags,
+                                    const AudioTimeStamp *inTimeStamp,
+                                    UInt32 inBusNumber,
+                                    UInt32 inNumberFrames,
+                                    AudioBufferList *ioData)
+{
+    if (*ioActionFlags & kAudioUnitRenderAction_PostRender) {
+        VLFLoopControl *control = (__bridge VLFLoopControl *)inRefCon;
+        
+        if (!(*ioActionFlags & kAudioUnitRenderAction_OutputIsSilence)) {
+            AudioTimeStamp playTime;
+            UInt32 pSize = sizeof(playTime);
+            CheckError(AudioUnitGetProperty(control->_unit, kAudioUnitProperty_CurrentPlayTime, kAudioUnitScope_Global, 0, &playTime, &pSize), "current play time");
+            
+            UInt32 playedFrames = playTime.mSampleTime;
+            control->_percentagePlayed = (Float32)(playedFrames % control->_framesToPlay) / control->_framesToPlay;
+        }
+    }
+    
+    return noErr;
+}
 
 #pragma mark public
 
@@ -51,35 +80,25 @@ static Float32 const kDragGainLowerBound = 0.0;
         
         NSString *filePath = [[NSBundle mainBundle] pathForResource:loopTitle ofType:@"m4a"];
         _loopURLRef = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)filePath, kCFURLPOSIXPathStyle, false);
+        _framesToPlay = playableFramesInURL(_loopURLRef);
+        _percentagePlayed = 0.0;
+        CheckError(AudioUnitAddRenderNotify(_unit, &UnitRenderCallback, (__bridge void*)self), "unit render notifier");
         
         CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateGraphics:)];
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
-        CGRect loopMeterRect = CGRectMake(0, 5, self.frame.size.width, self.bounds.size.height - 120);
+        CGRect loopMeterRect = CGRectMake(0, 4, self.frame.size.width - 1, self.bounds.size.height - 110);
         _meter = [[VLFLoopMeter alloc] initWithFrame:loopMeterRect];
         _meter.gain = 0.0;
         [self addSubview:_meter];
         
         [_meter addObserver:self forKeyPath:@"gain" options:NSKeyValueObservingOptionNew context:NULL];
         
-        CGRect buttonRect = CGRectMake(8, self.frame.size.height - 106, 60, 60);
+        CGRect buttonRect = CGRectMake(5, self.frame.size.height - 86, 62, 62);
         _button = [[VLFLoopButton alloc] initWithFrame:buttonRect];
-        [_button addUnit:_unit andURL:_loopURLRef];
         [self addSubview:_button];
         
         [_button addTarget:self action:@selector(handleButtonPressed) forControlEvents:UIControlEventTouchDown];
-        
-        CGFloat size = self.bounds.size.width - 50;
-        UITextView *name = [[UITextView alloc] initWithFrame:CGRectMake(26, self.bounds.size.height - 32, size, size)];
-        name.text = [_loopTitle substringToIndex:1];
-        [self addSubview:name];
-        
-//        UIImageView *face = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"facesmall"]];
-//        CGFloat size = self.bounds.size.width - 50;
-//        face.frame = CGRectMake(26, self.bounds.size.height - 32, size, size);
-//        face.layer.cornerRadius = size / 2;
-//        face.clipsToBounds = YES;
-//        [self addSubview:face];
     }
     return self;
 }
@@ -108,7 +127,12 @@ static Float32 const kDragGainLowerBound = 0.0;
 - (void)updateGraphics:(CADisplayLink *)link
 {
     if (_playing) {
-        [_button setNeedsDisplay];
+        if (kTransform) {
+            _button.transform = CGAffineTransformMakeRotation(_percentagePlayed * 2 * M_PI);
+        } else {
+            _button.percentagePlayed = _percentagePlayed;
+            [_button setNeedsDisplay];
+        }
     }
 }
 
@@ -126,17 +150,12 @@ static Float32 const kDragGainLowerBound = 0.0;
 {
     _playing = NO;
     AudioUnitReset(_unit, kAudioUnitScope_Global, 0);
-    [_button reset];
+    _percentagePlayed = 0.0;
+    if (kTransform) {
+        _button.transform = CGAffineTransformMakeRotation(_percentagePlayed * 2 * M_PI);
+    } else {
+        [_button reset];
+    }
 }
-
-//- (void)drawRect:(CGRect)rect
-//{
-//    CGRect allRect = self.bounds;
-//    CGContextRef context = UIGraphicsGetCurrentContext();
-//    
-//    CGContextSetRGBFillColor(context, .7f, .7f, .7f, .3f);
-//    CGFloat size = allRect.size.width - 50;
-//    CGContextFillRect(context, CGRectMake(26, allRect.size.height - 32, size, size));
-//}
 
 @end

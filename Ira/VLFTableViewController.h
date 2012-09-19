@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "VLFRecording.h"
+#import "VLFAudioGraph.h"
 
 @interface VLFTableViewController : UITableViewController
 

@@ -44,11 +44,11 @@
     CGContextBeginPath(context);
     
     // record top
-    CGContextMoveToPoint(context, _recordRect.origin.x, _recordRect.origin.y);
-    CGContextAddLineToPoint(context, _recordRect.size.width, _recordRect.origin.y);
+    //CGContextMoveToPoint(context, _recordRect.origin.x, _recordRect.origin.y);
+    //CGContextAddLineToPoint(context, _recordRect.size.width, _recordRect.origin.y);
     
-    CGContextMoveToPoint(context, size.width + 6, 0);
-    CGContextAddLineToPoint(context, size.width + 6, self.bounds.size.height);
+    CGContextMoveToPoint(context, size.width + 2, 0);
+    CGContextAddLineToPoint(context, size.width + 1, self.bounds.size.height);
     
     // top
     CGContextMoveToPoint(context, origin.x, origin.y);
@@ -76,6 +76,10 @@
         }
         CGContextFillRect(context, CGRectMake(_loopsRect.origin.x + arc4random_uniform(_loopsRect.size.width),
                                               _loopsRect.origin.y + arc4random_uniform(_loopsRect.size.height),
+                                              dim, dim));
+        
+        CGContextFillRect(context, CGRectMake(arc4random_uniform(_recordRect.size.width),
+                                              arc4random_uniform(_recordRect.origin.y),
                                               dim, dim));
     }
 }

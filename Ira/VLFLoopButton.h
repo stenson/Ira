@@ -12,7 +12,8 @@
 
 @interface VLFLoopButton : UIButton
 
-- (void)addUnit:(AudioUnit)unit andURL:(CFURLRef)url;
+@property (nonatomic) Float32 percentagePlayed;
+
 - (void)reset;
 
 @end

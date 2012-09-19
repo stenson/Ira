@@ -10,6 +10,8 @@
 
 @interface VLFTableViewController () {
     UITableView *_view;
+    NSMutableArray *_recordings;
+    NSString *_documentsDirectory;
 }
 @end
 
@@ -26,6 +28,17 @@
 
 - (void)viewDidLoad
 {
+    _recordings = [[NSMutableArray alloc] init];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    _documentsDirectory = [paths objectAtIndex:0];
+    
+    NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_documentsDirectory error:NULL];
+    [files enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSString *name = [files objectAtIndex:idx];
+        NSString *fullpath = [_documentsDirectory stringByAppendingFormat:@"/%@", name];
+        [_recordings insertObject:[[VLFRecording alloc] initWithName:name andPath:fullpath] atIndex:0];
+    }];
     [super viewDidLoad];
     
     // Uncomment the following line to preserve selection between presentations.
@@ -52,13 +65,13 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
-    return 0;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return 0;
+    return _recordings.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -66,7 +79,14 @@
     static NSString *CellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
+    
     // Configure the cell...
+    VLFRecording *recording = [_recordings objectAtIndex:indexPath.row];
+    cell.textLabel.text = recording.name;
     
     return cell;
 }

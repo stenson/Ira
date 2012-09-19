@@ -21,7 +21,8 @@
 		982188C015DDA5B800DEA89A /* banjo.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 982188BE15DDA5A300DEA89A /* banjo.m4a */; };
 		9821892615DECF2300DEA89A /* VLFTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9821892515DECF2300DEA89A /* VLFTableViewController.m */; };
 		98366E4015F08942009841A8 /* VLFRecordButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 98366E3F15F08942009841A8 /* VLFRecordButton.m */; };
-		9847DE28160850D000E05837 /* facesmall.png in Resources */ = {isa = PBXBuildFile; fileRef = 9847DE27160850D000E05837 /* facesmall.png */; };
+		9847DE2B1609685D00E05837 /* nemark_pic.png in Resources */ = {isa = PBXBuildFile; fileRef = 9847DE2A1609685D00E05837 /* nemark_pic.png */; };
+		9847DE2E1609A08800E05837 /* VLFRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = 9847DE2D1609A08700E05837 /* VLFRecording.m */; };
 		9853A2A015F885A800863CD1 /* facesmall.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A29F15F885A800863CD1 /* facesmall.png */; };
 		9853A2A215F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A115F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png */; };
 		9853A2A415F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png in Resources */ = {isa = PBXBuildFile; fileRef = 9853A2A315F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png */; };
@@ -65,7 +66,9 @@
 		9821892515DECF2300DEA89A /* VLFTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFTableViewController.m; sourceTree = "<group>"; };
 		98366E3E15F08942009841A8 /* VLFRecordButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFRecordButton.h; sourceTree = "<group>"; };
 		98366E3F15F08942009841A8 /* VLFRecordButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFRecordButton.m; sourceTree = "<group>"; };
-		9847DE27160850D000E05837 /* facesmall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = facesmall.png; path = ../../facesmall.png; sourceTree = "<group>"; };
+		9847DE2A1609685D00E05837 /* nemark_pic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = nemark_pic.png; path = ../../nemark_pic.png; sourceTree = "<group>"; };
+		9847DE2C1609A08700E05837 /* VLFRecording.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFRecording.h; sourceTree = "<group>"; };
+		9847DE2D1609A08700E05837 /* VLFRecording.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFRecording.m; sourceTree = "<group>"; };
 		9853A29F15F885A800863CD1 /* facesmall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = facesmall.png; sourceTree = "<group>"; };
 		9853A2A115F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Screen Shot 2012-09-06 at 12.19.09 AM.png"; sourceTree = "<group>"; };
 		9853A2A315F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Screen Shot 2012-09-06 at 12.21.40 AM.png"; sourceTree = "<group>"; };
@@ -167,6 +170,8 @@
 				9853A2AB1601BCBB00863CD1 /* VLFLoopButton.m */,
 				9853A2AD1602C58A00863CD1 /* VLFBackgroundView.h */,
 				9853A2AE1602C58A00863CD1 /* VLFBackgroundView.m */,
+				9847DE2C1609A08700E05837 /* VLFRecording.h */,
+				9847DE2D1609A08700E05837 /* VLFRecording.m */,
 			);
 			path = Ira;
 			sourceTree = "<group>";
@@ -174,7 +179,7 @@
 		02C2D88515A4A92000C46968 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				9847DE27160850D000E05837 /* facesmall.png */,
+				9847DE2A1609685D00E05837 /* nemark_pic.png */,
 				98F24E4615F048A500BB68CD /* newmark.m4a */,
 				98F24E4415EDF20400BB68CD /* image.png */,
 				9866BE3C15E4AB6000616193 /* ukulele.m4a */,
@@ -259,7 +264,7 @@
 				9853A2A015F885A800863CD1 /* facesmall.png in Resources */,
 				9853A2A215F8862300863CD1 /* Screen Shot 2012-09-06 at 12.19.09 AM.png in Resources */,
 				9853A2A415F886AB00863CD1 /* Screen Shot 2012-09-06 at 12.21.40 AM.png in Resources */,
-				9847DE28160850D000E05837 /* facesmall.png in Resources */,
+				9847DE2B1609685D00E05837 /* nemark_pic.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,6 +285,7 @@
 				9853A2A91601BAE700863CD1 /* VLFLoopMeter.m in Sources */,
 				9853A2AC1601BCBB00863CD1 /* VLFLoopButton.m in Sources */,
 				9853A2AF1602C58A00863CD1 /* VLFBackgroundView.m in Sources */,
+				9847DE2E1609A08800E05837 /* VLFRecording.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

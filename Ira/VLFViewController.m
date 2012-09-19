@@ -11,7 +11,7 @@
 
 #define OUTER_RECORD_RECT CGRectMake(0, 28, 222, 222)
 #define LOOP_BUTTONS_RECT CGRectMake(0, 250, 222, 204)
-static const CGFloat kMainWidth = 234;
+static const CGFloat kMainWidth = 226;
 
 @interface VLFViewController () {
     VLFAudioGraph *_audioGraph;
