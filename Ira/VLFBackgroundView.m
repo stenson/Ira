@@ -27,8 +27,8 @@
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    CGContextSetLineWidth(context, 0.3f);
-    CGContextSetRGBStrokeColor(context, .5f, .5f, .5f, 1.f);
+    CGContextSetLineWidth(context, 0.2f);
+    CGContextSetRGBStrokeColor(context, .4f, .4f, .4f, 1.f);
     
     [self drawLines:context];
     
@@ -48,7 +48,7 @@
     //CGContextAddLineToPoint(context, _recordRect.size.width, _recordRect.origin.y);
     
     CGContextMoveToPoint(context, size.width + 2, 0);
-    CGContextAddLineToPoint(context, size.width + 1, self.bounds.size.height);
+    CGContextAddLineToPoint(context, size.width + 2, self.bounds.size.height);
     
     // top
     CGContextMoveToPoint(context, origin.x, origin.y);

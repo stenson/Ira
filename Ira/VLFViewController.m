@@ -76,7 +76,7 @@ static const CGFloat kMainWidth = 226;
     CGFloat width = self.view.bounds.size.width - kMainWidth;
     
     _recordingsController.tableView.frame = CGRectMake(kMainWidth, 0, width, self.view.bounds.size.height);
-    _recordingsController.tableView.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1.0];
+    //_recordingsController.tableView.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1.0];
     
     [[self view] addSubview:_recordingsController.view];
 }

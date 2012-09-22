@@ -33,6 +33,7 @@
 		9866BE3B15E495F700616193 /* canvassimple@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3A15E495F700616193 /* canvassimple@2x.png */; };
 		9866BE3D15E4AB7A00616193 /* ukulele.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9866BE3C15E4AB6000616193 /* ukulele.m4a */; };
 		986F462315F5334900BD8508 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 986F462215F5334900BD8508 /* Accelerate.framework */; };
+		9881F355160E8174009C5624 /* VLFRecordingTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9881F354160E8174009C5624 /* VLFRecordingTableCell.m */; };
 		9899994915D0E2AF001CEB68 /* neworleans.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9899994815D0D7AC001CEB68 /* neworleans.m4a */; };
 		989A492415DAF86B0093ECAC /* doowop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 989A492315DAF8600093ECAC /* doowop.m4a */; };
 		989A493615DD1F130093ECAC /* VLFLoopControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 989A493515DD1F130093ECAC /* VLFLoopControl.m */; };
@@ -83,6 +84,8 @@
 		9866BE3C15E4AB6000616193 /* ukulele.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = ukulele.m4a; path = ../../ukulele.m4a; sourceTree = "<group>"; };
 		986F462215F5334900BD8508 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLFAudioUtilities.h; sourceTree = "<group>"; };
+		9881F353160E8174009C5624 /* VLFRecordingTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFRecordingTableCell.h; sourceTree = "<group>"; };
+		9881F354160E8174009C5624 /* VLFRecordingTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLFRecordingTableCell.m; sourceTree = "<group>"; };
 		9899994815D0D7AC001CEB68 /* neworleans.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = neworleans.m4a; sourceTree = "<group>"; };
 		989A492315DAF8600093ECAC /* doowop.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = doowop.m4a; path = "../../../Library/Application Support/iPhone Simulator/5.1/Applications/078F6802-F339-429D-92C8-7DE4FB47B4C4/Documents/doowop.m4a"; sourceTree = "<group>"; };
 		989A493415DD1F130093ECAC /* VLFLoopControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLFLoopControl.h; sourceTree = "<group>"; };
@@ -149,29 +152,12 @@
 		02C2D88415A4A92000C46968 /* Ira */ = {
 			isa = PBXGroup;
 			children = (
-				02C2D88D15A4A92000C46968 /* VLFAppDelegate.h */,
-				02C2D88E15A4A92000C46968 /* VLFAppDelegate.m */,
-				9821892415DECF2300DEA89A /* VLFTableViewController.h */,
-				9821892515DECF2300DEA89A /* VLFTableViewController.m */,
-				02C2D89015A4A92000C46968 /* VLFViewController.h */,
-				02C2D89115A4A92000C46968 /* VLFViewController.m */,
-				02C2D89315A4A92000C46968 /* VLFViewController.xib */,
+				9881F35B160E865F009C5624 /* Main */,
+				9881F35A160E820D009C5624 /* Recording */,
+				9881F359160E81FE009C5624 /* Audio */,
+				9881F358160E81E9009C5624 /* Table */,
+				9881F357160E8183009C5624 /* Loop */,
 				02C2D88515A4A92000C46968 /* Supporting Files */,
-				02C2D89F15A4B31900C46968 /* VLFAudioGraph.h */,
-				02C2D8A015A4B31900C46968 /* VLFAudioGraph.m */,
-				9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */,
-				989A493415DD1F130093ECAC /* VLFLoopControl.h */,
-				989A493515DD1F130093ECAC /* VLFLoopControl.m */,
-				98366E3E15F08942009841A8 /* VLFRecordButton.h */,
-				98366E3F15F08942009841A8 /* VLFRecordButton.m */,
-				9853A2A71601BAE700863CD1 /* VLFLoopMeter.h */,
-				9853A2A81601BAE700863CD1 /* VLFLoopMeter.m */,
-				9853A2AA1601BCBB00863CD1 /* VLFLoopButton.h */,
-				9853A2AB1601BCBB00863CD1 /* VLFLoopButton.m */,
-				9853A2AD1602C58A00863CD1 /* VLFBackgroundView.h */,
-				9853A2AE1602C58A00863CD1 /* VLFBackgroundView.m */,
-				9847DE2C1609A08700E05837 /* VLFRecording.h */,
-				9847DE2D1609A08700E05837 /* VLFRecording.m */,
 			);
 			path = Ira;
 			sourceTree = "<group>";
@@ -196,6 +182,65 @@
 				02C2D88C15A4A92000C46968 /* Ira-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		9881F357160E8183009C5624 /* Loop */ = {
+			isa = PBXGroup;
+			children = (
+				989A493415DD1F130093ECAC /* VLFLoopControl.h */,
+				989A493515DD1F130093ECAC /* VLFLoopControl.m */,
+				9853A2A71601BAE700863CD1 /* VLFLoopMeter.h */,
+				9853A2A81601BAE700863CD1 /* VLFLoopMeter.m */,
+				9853A2AA1601BCBB00863CD1 /* VLFLoopButton.h */,
+				9853A2AB1601BCBB00863CD1 /* VLFLoopButton.m */,
+			);
+			name = Loop;
+			sourceTree = "<group>";
+		};
+		9881F358160E81E9009C5624 /* Table */ = {
+			isa = PBXGroup;
+			children = (
+				9881F353160E8174009C5624 /* VLFRecordingTableCell.h */,
+				9881F354160E8174009C5624 /* VLFRecordingTableCell.m */,
+				9821892415DECF2300DEA89A /* VLFTableViewController.h */,
+				9821892515DECF2300DEA89A /* VLFTableViewController.m */,
+			);
+			name = Table;
+			sourceTree = "<group>";
+		};
+		9881F359160E81FE009C5624 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				02C2D89F15A4B31900C46968 /* VLFAudioGraph.h */,
+				02C2D8A015A4B31900C46968 /* VLFAudioGraph.m */,
+				9872A49D15B33AC70030EDB8 /* VLFAudioUtilities.h */,
+			);
+			name = Audio;
+			sourceTree = "<group>";
+		};
+		9881F35A160E820D009C5624 /* Recording */ = {
+			isa = PBXGroup;
+			children = (
+				98366E3E15F08942009841A8 /* VLFRecordButton.h */,
+				98366E3F15F08942009841A8 /* VLFRecordButton.m */,
+				9847DE2C1609A08700E05837 /* VLFRecording.h */,
+				9847DE2D1609A08700E05837 /* VLFRecording.m */,
+			);
+			name = Recording;
+			sourceTree = "<group>";
+		};
+		9881F35B160E865F009C5624 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				02C2D88D15A4A92000C46968 /* VLFAppDelegate.h */,
+				02C2D88E15A4A92000C46968 /* VLFAppDelegate.m */,
+				9853A2AD1602C58A00863CD1 /* VLFBackgroundView.h */,
+				9853A2AE1602C58A00863CD1 /* VLFBackgroundView.m */,
+				02C2D89015A4A92000C46968 /* VLFViewController.h */,
+				02C2D89115A4A92000C46968 /* VLFViewController.m */,
+				02C2D89315A4A92000C46968 /* VLFViewController.xib */,
+			);
+			name = Main;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -286,6 +331,7 @@
 				9853A2AC1601BCBB00863CD1 /* VLFLoopButton.m in Sources */,
 				9853A2AF1602C58A00863CD1 /* VLFBackgroundView.m in Sources */,
 				9847DE2E1609A08800E05837 /* VLFRecording.m in Sources */,
+				9881F355160E8174009C5624 /* VLFRecordingTableCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

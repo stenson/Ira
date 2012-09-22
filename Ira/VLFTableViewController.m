@@ -82,6 +82,7 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
         cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.textLabel.font = [UIFont fontWithName:@"Courier" size:10];
     }
     
     // Configure the cell...
