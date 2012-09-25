@@ -13,6 +13,7 @@ static UInt32 const kLoopFadingIn = 1;
 static UInt32 const kLoopFadingOut = 2;
 static UInt32 const kLoopFullVolume = 3;
 static Float32 const kDragGainLowerBound = 0.0;
+static const float kLoopButtonResetAnimationDuration = 0.25f;
 
 static const BOOL kTransform = YES;
 
@@ -78,6 +79,8 @@ static OSStatus UnitRenderCallback (void *inRefCon,
         
         _loopTitle = loopTitle;
         
+        NSLog(@"%@", loopTitle);
+        
         NSString *filePath = [[NSBundle mainBundle] pathForResource:loopTitle ofType:@"m4a"];
         _loopURLRef = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)filePath, kCFURLPOSIXPathStyle, false);
         _framesToPlay = playableFramesInURL(_loopURLRef);
@@ -87,15 +90,17 @@ static OSStatus UnitRenderCallback (void *inRefCon,
         CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateGraphics:)];
         [link addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         
-        CGRect loopMeterRect = CGRectMake(0, 4, self.frame.size.width - 1, self.bounds.size.height - 110);
+        CGRect loopMeterRect = CGRectMake(0, 0, self.frame.size.width - 1, self.bounds.size.height - 100);
         _meter = [[VLFLoopMeter alloc] initWithFrame:loopMeterRect];
         _meter.gain = 0.0;
         [self addSubview:_meter];
         
         [_meter addObserver:self forKeyPath:@"gain" options:NSKeyValueObservingOptionNew context:NULL];
         
-        CGRect buttonRect = CGRectMake(5, self.frame.size.height - 86, 62, 62);
-        _button = [[VLFLoopButton alloc] initWithFrame:buttonRect];
+        CGFloat buttonWidth = 78;
+        CGFloat bottom = 86;
+        CGRect buttonRect = CGRectMake((self.frame.size.width - buttonWidth) / 2, self.frame.size.height - bottom, buttonWidth, buttonWidth);
+        _button = [[VLFLoopButton alloc] initWithFrame:buttonRect andTitle:_loopTitle];
         [self addSubview:_button];
         
         [_button addTarget:self action:@selector(handleButtonPressed) forControlEvents:UIControlEventTouchDown];
@@ -152,7 +157,11 @@ static OSStatus UnitRenderCallback (void *inRefCon,
     AudioUnitReset(_unit, kAudioUnitScope_Global, 0);
     _percentagePlayed = 0.0;
     if (kTransform) {
+        [UIView beginAnimations:@"ResetRotate" context:nil];
+        [UIView setAnimationDuration:kLoopButtonResetAnimationDuration];
+        [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
         _button.transform = CGAffineTransformMakeRotation(_percentagePlayed * 2 * M_PI);
+        [UIView commitAnimations];
     } else {
         [_button reset];
     }

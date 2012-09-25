@@ -14,6 +14,7 @@
 
 @property (nonatomic) Float32 percentagePlayed;
 
+- (id)initWithFrame:(CGRect)frame andTitle:(NSString *)title;
 - (void)reset;
 
 @end

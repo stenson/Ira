@@ -9,14 +9,15 @@
 #import "VLFViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define OUTER_RECORD_RECT CGRectMake(0, 28, 222, 222)
-#define LOOP_BUTTONS_RECT CGRectMake(0, 250, 222, 204)
 static const CGFloat kMainWidth = 226;
 
 @interface VLFViewController () {
     VLFAudioGraph *_audioGraph;
     VLFRecordButton *_record;
     VLFBackgroundView *_background;
+    
+    CGRect _loopButtonsRect;
+    CGRect _outerRecordRect;
     
     UIScrollView *_loops;
     UITableView *_recordings;
@@ -38,11 +39,11 @@ static const CGFloat kMainWidth = 226;
 
 - (void)addLoopButtons
 {
-    _loops = [[UIScrollView alloc] initWithFrame:LOOP_BUTTONS_RECT];
+    _loops = [[UIScrollView alloc] initWithFrame:_loopButtonsRect];
     _loops.showsHorizontalScrollIndicator = NO;
     
-    NSArray *titles = [[NSArray alloc] initWithObjects:@"doowop", @"newmark", @"ukulele", @"fiddle2", nil];
-    CGRect frame = LOOP_BUTTONS_RECT;
+    NSArray *titles = [[NSArray alloc] initWithObjects:@"newmark", @"fiddle2", @"ukulele", @"newmark", nil];
+    CGRect frame = _loopButtonsRect;
     
     CGFloat xDim = floorf(frame.size.width / 3);
     CGFloat yDim = frame.size.height;
@@ -50,7 +51,7 @@ static const CGFloat kMainWidth = 226;
     int i = 0;
     
     for (NSString *title in titles) {
-        CGRect rect = CGRectMake(0 + xDim * i, 0, xDim, yDim);
+        CGRect rect = CGRectMake(xDim * i, 0, xDim, yDim);
         
         VLFLoopControl *button = [[VLFLoopControl alloc] initWithFrame:rect audioUnitIndex:[_audioGraph fetchFilePlayer] audioGraph:_audioGraph andLoopTitle:title];
         
@@ -64,7 +65,11 @@ static const CGFloat kMainWidth = 226;
 
 - (void)addRecordButton
 {
-    _record = [[VLFRecordButton alloc] initWithFrame:CGRectInset(OUTER_RECORD_RECT, 10, 10)];
+    CGFloat squareDimension = _outerRecordRect.size.height - 20;
+    CGFloat offset = (_outerRecordRect.size.width - squareDimension) / 2;
+    _record = [[VLFRecordButton alloc] initWithFrame:CGRectMake(_outerRecordRect.origin.x + offset,
+                                                                _outerRecordRect.origin.y + 00,
+                                                                squareDimension, squareDimension)];
     _record.graph = _audioGraph;
     [[self view] addSubview:_record];
 }
@@ -76,7 +81,6 @@ static const CGFloat kMainWidth = 226;
     CGFloat width = self.view.bounds.size.width - kMainWidth;
     
     _recordingsController.tableView.frame = CGRectMake(kMainWidth, 0, width, self.view.bounds.size.height);
-    //_recordingsController.tableView.backgroundColor = [UIColor colorWithWhite:0.97 alpha:1.0];
     
     [[self view] addSubview:_recordingsController.view];
 }
@@ -84,14 +88,19 @@ static const CGFloat kMainWidth = 226;
 - (void)addBackgroundView
 {
     _background = [[VLFBackgroundView alloc] initWithFrame:self.view.frame];
-    _background.recordRect = OUTER_RECORD_RECT;
-    _background.loopsRect = LOOP_BUTTONS_RECT;
+    _background.recordRect = _outerRecordRect;
+    _background.loopsRect = _loopButtonsRect;
     
     [self.view addSubview:_background];
 }
 
 - (void)viewDidLoad
 {
+    CGFloat width = [[UIScreen mainScreen] bounds].size.width;
+    CGFloat margin = 12.f;
+    _outerRecordRect = CGRectMake(0, 40, width, 222);
+    _loopButtonsRect = CGRectMake(margin, 262, width - margin*2, 184);
+    
     self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"canvassimple"]];
     
     _audioGraph = [[VLFAudioGraph alloc] init];
@@ -100,7 +109,7 @@ static const CGFloat kMainWidth = 226;
     [self addBackgroundView];
     [self addRecordButton];
     [self addLoopButtons];
-    [self addTableView];
+    //[self addTableView];
     
     [super viewDidLoad];
 }

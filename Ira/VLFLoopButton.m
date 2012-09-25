@@ -10,6 +10,7 @@
 
 @interface VLFLoopButton () {
     UIImage *_image;
+    UIColor *_averageColor;
 }
 @end
 
@@ -17,11 +18,12 @@
 
 @synthesize percentagePlayed = _percentagePlayed;
 
-- (id)initWithFrame:(CGRect)frame
+- (id)initWithFrame:(CGRect)frame andTitle:(NSString *)title
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _image = [UIImage imageNamed:@"nemark_pic"];
+        _image = [UIImage imageNamed:[title stringByAppendingString:@"_pic"]];
+        _averageColor = [self calculateAverageColorInImage:_image];
     }
     return  self;
 }
@@ -32,16 +34,23 @@
     [self setNeedsDisplay];
 }
 
-- (void)drawRect:(CGRect)rect
+- (UIColor *)calculateAverageColorInImage:(UIImage *)image
 {
-    if (YES) {
-        [self drawRect:rect withImage:_image];
-    } else {
-        [self drawColorfulRect:rect];
-    }
+    CGSize size = {1, 1};
+	UIGraphicsBeginImageContext(size);
+	CGContextRef ctx = UIGraphicsGetCurrentContext();
+	CGContextSetInterpolationQuality(ctx, kCGInterpolationMedium);
+	[image drawInRect:(CGRect){.size = size} blendMode:kCGBlendModeCopy alpha:1];
+	uint8_t *data = CGBitmapContextGetData(ctx);
+	UIColor *color = [UIColor colorWithRed:data[0] / 155.0f
+									 green:data[1] / 155.0f
+									  blue:data[2] / 155.0f
+									 alpha:0.8];
+	UIGraphicsEndImageContext();
+	return color;
 }
 
-- (void)drawRect:(CGRect)rect withImage:(UIImage *)image
+- (void)drawRect:(CGRect)rect
 {
     CGRect allRect = self.bounds;
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -82,45 +91,10 @@
     CGContextRotateCTM(context, ((_percentagePlayed + .125)*2) * M_PI);
     CGContextTranslateCTM(context, -allRect.size.width/2, -allRect.size.height/2);
     
-    CGContextSetRGBFillColor(context, 1.f, 1.f, 1.f, .4f);
-    CGContextSetRGBFillColor(context, .3f, .3f, .7f, 1.f);
-    CGContextFillRect(context, CGRectMake(0, allRect.size.height*.66, allRect.size.width, allRect.size.height/3));
-    
-    CGContextRestoreGState(context);
-    
-    [[UIColor clearColor] setFill];
-    CGContextSetLineWidth(context, 1.f);
-    CGContextStrokeEllipseInRect(context, allRect);
-}
-
-- (void)drawColorfulRect:(CGRect)rect
-{
-    CGRect allRect = self.bounds;
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    CGFloat inset = 0.f;
-    CGRect circle = CGRectInset(allRect, inset, inset);
-    CGContextSetRGBFillColor(context, .3f, .3f, .9f, 1.f);
-    CGContextFillEllipseInRect(context, circle);
-    
-    CGContextSetRGBStrokeColor(context, 1.f, 1.f, 1.f, 1.f);
-    CGContextStrokeEllipseInRect(context, CGRectInset(circle, 3.f, 3.f));
-    
-    CGContextSaveGState(context);
-    
-    CGPoint center = CGPointMake(allRect.size.width/2, allRect.size.height/2);
-    CGFloat radius = (allRect.size.width/2) - inset - 6.f;
-    CGContextMoveToPoint(context, center.x, center.y);
-    CGContextAddArc(context, center.x, center.y, radius, 0, M_PI*2, 0);
-    CGContextClosePath(context);
-    CGContextClip(context);
-    
-    CGContextTranslateCTM(context, allRect.size.width / 2, allRect.size.height / 2);
-    CGContextRotateCTM(context, ((_percentagePlayed + .125)*2) * M_PI);
-    CGContextTranslateCTM(context, -allRect.size.width/2, -allRect.size.height/2);
-    
-    CGContextSetRGBFillColor(context, .3f, .3f, .7f, 1.f);
-    CGContextFillRect(context, CGRectMake(0, allRect.size.height/2, allRect.size.width, allRect.size.height/2));
+    //CGContextSetRGBFillColor(context, .3f, .3f, .7f, 1.f);
+    [_averageColor setFill];
+    CGFloat denom = 2.5;
+    CGContextFillRect(context, CGRectMake(0, allRect.size.height*(1-(1/denom)), allRect.size.width, allRect.size.height/denom));
     
     CGContextRestoreGState(context);
     

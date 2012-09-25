@@ -20,6 +20,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.viewController = [[VLFViewController alloc] initWithNibName:@"VLFViewController" bundle:nil];
     self.window.rootViewController = self.viewController;
+    [application setStatusBarStyle:UIStatusBarStyleBlackOpaque];
     [self.window makeKeyAndVisible];
     return YES;
 }

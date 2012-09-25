@@ -27,45 +27,17 @@
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    CGContextSetLineWidth(context, 0.2f);
-    CGContextSetRGBStrokeColor(context, .4f, .4f, .4f, 1.f);
+    CGRect speckRect = CGRectInset(_loopsRect, -4.f, -4.f);
     
-    [self drawLines:context];
-    
-    CGContextSetRGBFillColor(context, .4f, .4f, .4f, 1.f);
-    UIFont *logotype = [UIFont fontWithName:@"Courier-Bold" size:12];
-    [@"Ira" drawInRect:CGRectInset(self.bounds, 8.f, 6.f) withFont:logotype];
-}
-
-- (void)drawLines:(CGContextRef)context
-{
-    CGPoint origin = _loopsRect.origin;
-    CGSize size = _loopsRect.size;
-    CGContextBeginPath(context);
-    
-    // record top
-    //CGContextMoveToPoint(context, _recordRect.origin.x, _recordRect.origin.y);
-    //CGContextAddLineToPoint(context, _recordRect.size.width, _recordRect.origin.y);
-    
-    CGContextMoveToPoint(context, size.width + 2, 0);
-    CGContextAddLineToPoint(context, size.width + 2, self.bounds.size.height);
-    
-    // top
-    CGContextMoveToPoint(context, origin.x, origin.y);
-    CGContextAddLineToPoint(context, size.width, origin.y);
-    
-    // bottom
-    CGContextMoveToPoint(context, origin.x, origin.y + size.height);
-    CGContextAddLineToPoint(context, size.width, origin.y + size.height);
-    
-    // stroke em
-    CGContextStrokePath(context);
+    CGContextSetLineWidth(context, 2.f);
+    CGContextSetRGBStrokeColor(context, .4f, .4f, .4f, .15f);
+    CGContextStrokeRect(context, speckRect);
     
     CGContextSetRGBFillColor(context, 1.f, 1.f, 1.f, 1.f);
-    CGContextFillRect(context, _loopsRect);
+    CGContextFillRect(context, speckRect);
     
     int i = 0;
-    for (i = 0; i < 5000; i++) {
+    for (i = 0; i < 7000; i++) {
         CGFloat dim = .5f;
         
         if (arc4random_uniform(2) > 1) {
@@ -74,14 +46,18 @@
         } else {
             CGContextSetRGBFillColor(context, .7f, .7f, .7f, 1.f);
         }
-        CGContextFillRect(context, CGRectMake(_loopsRect.origin.x + arc4random_uniform(_loopsRect.size.width),
-                                              _loopsRect.origin.y + arc4random_uniform(_loopsRect.size.height),
+        CGContextFillRect(context, CGRectMake(speckRect.origin.x + arc4random_uniform(speckRect.size.width),
+                                              speckRect.origin.y + arc4random_uniform(speckRect.size.height),
                                               dim, dim));
         
         CGContextFillRect(context, CGRectMake(arc4random_uniform(_recordRect.size.width),
                                               arc4random_uniform(_recordRect.origin.y),
                                               dim, dim));
     }
+    
+    CGContextSetRGBFillColor(context, .4f, .4f, .4f, 1.f);
+    UIFont *logotype = [UIFont fontWithName:@"Courier-Bold" size:12];
+    [@"Ira" drawInRect:CGRectInset(self.bounds, 8.f, 6.f) withFont:logotype];
 }
 
 @end
