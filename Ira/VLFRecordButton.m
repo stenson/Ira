@@ -45,9 +45,16 @@ static const CGFloat kRecordingRed[4] = { 1.f, .2f, .2f, 1.f };
 
 - (void)updateGraphics:(CADisplayLink *)link
 {
-    _inputGain = [_graph getMicrophoneAverageDecibels] * 10;
-    _inputGain = floorf(_inputGain * 100) / 100 + 0.45;
-    _inputGain = fminf(_inputGain, 1.f);
+    if (YES) {
+        _inputGain = [_graph getMicrophoneAverageDecibels] * 10;
+        _inputGain = floorf(_inputGain * 100) / 100 + 0.45;
+        _inputGain = fminf(_inputGain, 1.f);
+    } else {
+        _inputGain = [_graph getMicrophoneAverageDecibels] / 9500;
+        _inputGain = powf(10, _inputGain) / 10;
+        _inputGain = fmaxf(_inputGain, .3f);
+    }
+    
     [self setNeedsDisplay];
 }
 

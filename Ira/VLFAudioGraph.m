@@ -120,12 +120,11 @@ static OSStatus MicrophoneCallback (void *inRefCon,
     if (*ioActionFlags & kAudioUnitRenderAction_PostRender) {
         VLFAudioGraph *graph = (__bridge VLFAudioGraph *)inRefCon;
         
-        //Float32 *buffer = (Float32 *)ioData->mBuffers[0].mData;
         vDSP_vflt16(ioData->mBuffers[0].mData, 1, graph->_scratchBuffer, 1, inNumberFrames);
         
         float avg = 0.0;
-        //vDSP_meamgv(ioData->mBuffers[0].mData, 1, &avg, inNumberFrames);
-        vDSP_meamgv(graph->_scratchBuffer, 1, &avg, inNumberFrames);
+        vDSP_meamgv(ioData->mBuffers[0].mData, 1, &avg, inNumberFrames);
+        //vDSP_meamgv(graph->_scratchBuffer, 1, &avg, inNumberFrames);
         
         graph->_micAverageCount++;
         graph->_micAverage += avg;
@@ -155,6 +154,7 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     _micAverage = 0.0;
     _micAverageCount = 0;
     
+    //NSLog(@"%f", average);
     return average;
 }
 
@@ -286,10 +286,9 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     CheckError(AudioUnitAddRenderNotify(notifierUnit, &RecordingCallback, (__bridge void*)self), "render notify");
     CheckError(AudioUnitGetProperty(notifierUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &_notifierASBD, &asbdSize), "notifier ABSD");
     
-    //CheckError(AudioUnitAddRenderNotify(lowpassUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
-    CheckError(AudioUnitAddRenderNotify(_finalMixUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
+    CheckError(AudioUnitAddRenderNotify(lowpassUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
+    //CheckError(AudioUnitAddRenderNotify(_finalMixUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
     
-    [self printASBD:_notifierASBD];
     CheckError(AUGraphConnectNodeInput(graph, rio, 1, mixer, 0), "plug");
     
     if (YES) {
@@ -310,8 +309,6 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     }
 
     CheckError(AUGraphConnectNodeInput(graph, filePlayer, 0, _finalMix, 1), "plug");
-    
-    CAShow(graph);
     
     // to headphones
     CheckError(AUGraphConnectNodeInput(graph, _finalMix, 0, rio, 0), "plug");
@@ -447,6 +444,10 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     UInt32 formatID = CFSwapInt32HostToBig (asbd.mFormatID);
     bcopy (&formatID, formatIDString, 4);
     formatIDString[4] = '\0';
+    
+    if (asbd.mFormatFlags & kAudioFormatFlagIsSignedInteger) {
+        NSLog(@"YES IT's INTEGER");
+    }
     
     NSLog (@"  Sample Rate:         %10.0f",  asbd.mSampleRate);
     NSLog (@"  Format ID:           %10s",    formatIDString);
