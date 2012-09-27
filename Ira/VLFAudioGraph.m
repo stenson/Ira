@@ -12,8 +12,7 @@
 static NSString * const kRecordedFileName = @"%@/recorded-program-output.m4a";
 static Float32 const kMicrophoneGain = -40;
 
-static const Float32 tenBandEQFreqs[10] = { 32., 64., 128., 256., 512., 1024., 2048., 4096., 8192., 16384. };
-static const Float32 tenBandEQDecibels[10] = { 13.2, 11.6, 9.4, -1.1, -2.8, -3.5, -5.4, -1.2, 4.3, -12.0 };
+#define METER_ON_LOWPASS 1
 
 @interface VLFAudioGraph () {
     AUGraph graph;
@@ -120,11 +119,14 @@ static OSStatus MicrophoneCallback (void *inRefCon,
     if (*ioActionFlags & kAudioUnitRenderAction_PostRender) {
         VLFAudioGraph *graph = (__bridge VLFAudioGraph *)inRefCon;
         
-        vDSP_vflt16(ioData->mBuffers[0].mData, 1, graph->_scratchBuffer, 1, inNumberFrames);
+        if (!METER_ON_LOWPASS) {
+            vDSP_vflt16(ioData->mBuffers[0].mData, 1, graph->_scratchBuffer, 1, inNumberFrames);
+        }
         
         float avg = 0.0;
-        vDSP_meamgv(ioData->mBuffers[0].mData, 1, &avg, inNumberFrames);
-        //vDSP_meamgv(graph->_scratchBuffer, 1, &avg, inNumberFrames);
+        
+        METER_ON_LOWPASS ? vDSP_meamgv(ioData->mBuffers[0].mData, 1, &avg, inNumberFrames)
+            : vDSP_meamgv(graph->_scratchBuffer, 1, &avg, inNumberFrames);
         
         graph->_micAverageCount++;
         graph->_micAverage += avg;
@@ -219,39 +221,44 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     AUNode rio = [self addNodeWithType:kAudioUnitType_Output AndSubtype:kAudioUnitSubType_RemoteIO];
     AUNode mixer = [self addNodeWithType:kAudioUnitType_Mixer AndSubtype:kAudioUnitSubType_MultiChannelMixer];
     
-    AUNode nBandEq = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_NBandEQ];
     AUNode lowpass = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_LowPassFilter];
+    AUNode lowshelf = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_LowShelfFilter];
+    AUNode eqLow = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_ParametricEQ];
+    AUNode eqHi = [self addNodeWithType:kAudioUnitType_Effect AndSubtype:kAudioUnitSubType_ParametricEQ];
+    
     AUNode filePlayer = [self addNodeWithType:kAudioUnitType_Generator AndSubtype:kAudioUnitSubType_AudioFilePlayer];
     _finalMix = [self addNodeWithType:kAudioUnitType_Mixer AndSubtype:kAudioUnitSubType_MultiChannelMixer];
     
     CheckError(AUGraphOpen(graph), "open graph");
     
-    AudioUnit nBandEqUnit;
     AudioUnit lowpassUnit;
+    AudioUnit lowshelfUnit;
+    AudioUnit eqLowUnit;
+    AudioUnit eqHiUnit;
     
     CheckError(AUGraphNodeInfo(graph, rio, NULL, &_rioUnit), "rioUnit");
+    CheckError(AUGraphNodeInfo(graph, eqHi, NULL, &eqHiUnit), "eqHiUnit");
+    CheckError(AUGraphNodeInfo(graph, eqLow, NULL, &eqLowUnit), "eqLowUnit");
     CheckError(AUGraphNodeInfo(graph, mixer, NULL, &_mixerUnit), "mixerUnit");
-    CheckError(AUGraphNodeInfo(graph, nBandEq, NULL, &nBandEqUnit), "nbandeqUnit");
     CheckError(AUGraphNodeInfo(graph, lowpass, NULL, &lowpassUnit), "lowpassUnit");
+    CheckError(AUGraphNodeInfo(graph, lowshelf, NULL, &lowshelfUnit), "lowshelfUnit");
     CheckError(AUGraphNodeInfo(graph, _finalMix, NULL, &_finalMixUnit), "finalMixUnit");
     CheckError(AUGraphNodeInfo(graph, filePlayer, NULL, &filePlayerUnit), "filePlayerUnit");
     
-    UInt32 maxBands;
-    UInt32 maxBandsSize = sizeof(maxBands);
-    CheckError(AudioUnitGetProperty(nBandEqUnit, kAUNBandEQProperty_MaxNumberOfBands, kAudioUnitScope_Global, 0, &maxBands, &maxBandsSize), "max bands");
-    NSLog(@"MAX BANDS %lu", maxBands);
+    CheckError(AudioUnitSetParameter(lowpassUnit, kLowPassParam_CutoffFrequency, kAudioUnitScope_Global, 0, 9663.0, 0), "cut freq");
+    CheckError(AudioUnitSetParameter(lowpassUnit, kLowPassParam_Resonance, kAudioUnitScope_Global, 0, -0.4, 0), "resonance");
     
-    UInt32 numBands = 10;
-    CheckError(AudioUnitSetProperty(nBandEqUnit, kAUNBandEQProperty_NumberOfBands, kAudioUnitScope_Global, 0, &numBands, sizeof(numBands)), "set bands");
+    CheckError(AudioUnitSetParameter(lowshelfUnit, kAULowShelfParam_CutoffFrequency, kAudioUnitScope_Global, 0, 159.0, 0), "cut freq");
+    CheckError(AudioUnitSetParameter(lowshelfUnit, kAULowShelfParam_Gain, kAudioUnitScope_Global, 0, 19.1, 0), "gain");
     
-    for (int i = 0; i < 10; i++) {
-        CheckError(AudioUnitSetParameter(nBandEqUnit, kAUNBandEQParam_Frequency + i, kAudioUnitScope_Global, 0, tenBandEQFreqs[i], 0), "nband freq");
-        CheckError(AudioUnitSetParameter(nBandEqUnit, kAUNBandEQParam_Gain + i, kAudioUnitScope_Global, 0, tenBandEQDecibels[i], 0), "nband gain");
-        CheckError(AudioUnitSetParameter(nBandEqUnit, kAUNBandEQParam_Bandwidth + i, kAudioUnitScope_Global, 0, 10.0, 0), "n band q");
-    }
-    
-    CheckError(AudioUnitSetParameter(lowpassUnit, kLowPassParam_CutoffFrequency, kAudioUnitScope_Global, 0, 2000.0, 0), "cut freq");
+    CheckError(AudioUnitSetParameter(eqLowUnit, kParametricEQParam_CenterFreq, kAudioUnitScope_Global, 0, 450, 0), "low eq");
+    CheckError(AudioUnitSetParameter(eqLowUnit, kParametricEQParam_Gain, kAudioUnitScope_Global, 0, -4.5, 0), "low eq");
+    CheckError(AudioUnitSetParameter(eqLowUnit, kParametricEQParam_Q, kAudioUnitScope_Global, 0, 0.67, 0), "low eq");
 
+    CheckError(AudioUnitSetParameter(eqHiUnit, kParametricEQParam_CenterFreq, kAudioUnitScope_Global, 0, 3500, 0), "hi eq");
+    CheckError(AudioUnitSetParameter(eqHiUnit, kParametricEQParam_Gain, kAudioUnitScope_Global, 0, -10.0, 0), "hi eq");
+    CheckError(AudioUnitSetParameter(eqHiUnit, kParametricEQParam_Q, kAudioUnitScope_Global, 0, 0.19, 0), "hi eq");
+    
     UInt32 oneFlag = 1;
 	AudioUnitElement bus0 = 0;
 	CheckError(AudioUnitSetProperty(_rioUnit, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, bus0, &oneFlag, sizeof(oneFlag)),
@@ -265,7 +272,8 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     UInt32 asbdSize = sizeof(effectASBD);
     memset(&effectASBD, 0, asbdSize);
     
-    CheckError(AudioUnitGetProperty(nBandEqUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &effectASBD, &asbdSize),
+    
+    CheckError(AudioUnitGetProperty(lowpassUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &effectASBD, &asbdSize),
                "get the effect asbd");
     
     Float64 hardwareSampleRate;
@@ -286,24 +294,20 @@ static void FileCompleteCallback(void *userData, ScheduledAudioFileRegion *buffe
     CheckError(AudioUnitAddRenderNotify(notifierUnit, &RecordingCallback, (__bridge void*)self), "render notify");
     CheckError(AudioUnitGetProperty(notifierUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &_notifierASBD, &asbdSize), "notifier ABSD");
     
-    CheckError(AudioUnitAddRenderNotify(lowpassUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
-    //CheckError(AudioUnitAddRenderNotify(_finalMixUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
+    if (METER_ON_LOWPASS) {
+        CheckError(AudioUnitAddRenderNotify(lowpassUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
+    } else {
+        CheckError(AudioUnitAddRenderNotify(_finalMixUnit, &MicrophoneCallback, (__bridge void*)self), "mic notify");
+    }
     
     CheckError(AUGraphConnectNodeInput(graph, rio, 1, mixer, 0), "plug");
     
-    if (YES) {
-        if (NO) {
-//            CheckError(AUGraphConnectNodeInput(graph, mixer, 0, eqNodes[0], 0), "plug");
-//            int limit = TARGET_IPHONE_SIMULATOR ? 2 : 9;
-//            for (int p = 1; p <= limit; p++) {
-//                CheckError(AUGraphConnectNodeInput(graph, eqNodes[p-1], 0, eqNodes[p], 0), "eq plug");
-//            }
-//            CheckError(AUGraphConnectNodeInput(graph, eqNodes[limit], 0, lowpass, 0), "plug");
-        } else {
-            CheckError(AUGraphConnectNodeInput(graph, mixer, 0, nBandEq, 0), "plug");
-            CheckError(AUGraphConnectNodeInput(graph, nBandEq, 0, lowpass, 0), "plug");
-            CheckError(AUGraphConnectNodeInput(graph, lowpass, 0, _finalMix, 0), "plug");
-        }
+    if (NO) {
+        CheckError(AUGraphConnectNodeInput(graph, mixer, 0, lowshelf, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, lowshelf, 0, lowpass, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, lowpass, 0, eqLow, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, eqLow, 0, eqHi, 0), "plug");
+        CheckError(AUGraphConnectNodeInput(graph, eqHi, 0, _finalMix, 0), "plug");
     } else {
         CheckError(AUGraphConnectNodeInput(graph, mixer, 0, _finalMix, 0), "plug");
     }
